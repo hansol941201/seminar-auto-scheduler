@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>찾아가는 세미나 자동배정</title>
+<style>
+:root{
+  --navy:#14243a;
+  --navy2:#203650;
+  --bg:#f5f7fa;
+  --card:#fff;
+  --line:#e4e9ef;
+  --text:#17202b;
+  --muted:#75808d;
+  --blue:#356ae6;
+  --green:#16855b;
+  --red:#d84a4a;
+  --orange:#c97b18;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Pretendard,"Noto Sans KR",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{
+  height:68px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.logo{font-weight:800;font-size:19px}
+.logo small{font-size:12px;color:var(--muted);font-weight:500;margin-left:10px}
+.header-right{display:flex;gap:10px;align-items:center}
+.header-right select{
+  border:1px solid var(--line);
+  padding:9px 12px;
+  border-radius:8px;
+  background:#fff;
+}
+.layout{display:flex;min-height:calc(100vh - 68px)}
+aside{
+  width:218px;
+  background:#fff;
+  border-right:1px solid var(--line);
+  padding:22px 14px;
+}
+.nav{
+  padding:12px 14px;
+  margin-bottom:5px;
+  border-radius:8px;
+  font-size:14px;
+  color:#53606e;
+  cursor:pointer;
+}
+.nav:hover{background:#f3f6fa}
+.nav.active{background:#edf3ff;color:#255dcc;font-weight:700}
+main{flex:1;padding:26px;min-width:0}
+.page{display:none}
+.page.active{display:block}
+.title-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:22px;
+}
+h1{font-size:24px;margin:0 0 6px}
+.desc{font-size:13px;color:var(--muted)}
+.btn{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:8px;
+  padding:9px 14px;
+  font-size:13px;
+  font-weight:600;
+}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:white}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.danger{color:var(--red)}
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+.kpi{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:17px;
+}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi strong{display:block;font-size:24px;margin-top:7px}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin-bottom:16px;
+  overflow:hidden;
+}
+.panel-head{
+  padding:16px 18px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.panel-head strong{font-size:15px}
+.panel-body{padding:18px}
+.search{
+  width:100%;
+  border:1px solid #d9e0e8;
+  border-radius:9px;
+  padding:11px 13px;
+  outline:none;
+}
+.search:focus{border-color:#6d91e9;box-shadow:0 0 0 3px #edf2ff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  background:#f8fafc;
+  color:#687481;
+  font-weight:600;
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid var(--line);
+}
+td{padding:13px 12px;border-bottom:1px solid #edf0f3}
+tr:last-child td{border-bottom:0}
+.company{font-weight:700}
+.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:20px;
+  padding:5px 9px;
+  font-size:11px;
+  font-weight:700;
+}
+.wait{background:#f0f2f5;color:#68727e}
+.ok{background:#e8f7f0;color:#147550}
+.no{background:#fdeeee;color:#c33d3d}
+.status-buttons{display:flex;gap:5px}
+.mini{
+  width:31px;height:29px;border:1px solid var(--line);
+  background:#fff;border-radius:6px;font-weight:800;
+}
+.mini.o:hover,.mini.o.on{background:#e8f7f0;color:var(--green);border-color:#b8dfcf}
+.mini.x:hover,.mini.x.on{background:#fdeeee;color:var(--red);border-color:#efc5c5}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field label{display:block;font-size:12px;color:#687481;margin-bottom:6px;font-weight:600}
+.field input,.field select{
+  width:100%;border:1px solid #dce2e8;border-radius:8px;padding:10px;background:#fff;
+}
+.company-result{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+  margin-top:10px;
+  cursor:pointer;
+  transition:.15s;
+}
+.company-result:hover{border-color:#8fa9e4;background:#fafcff}
+.company-result.selected{border-color:#5f82d7;background:#f4f7ff}
+.info-box{
+  background:#f7f9fc;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+  margin:14px 0;
+}
+.priority{
+  display:grid;
+  grid-template-columns:70px 1fr 1fr;
+  gap:9px;
+  align-items:center;
+  margin-bottom:9px;
+}
+.priority strong{font-size:12px}
+.schedule-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+}
+.day{
+  background:#fff;border:1px solid var(--line);border-radius:11px;min-height:320px;
+}
+.day-head{padding:13px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px}
+.event{
+  margin:10px;padding:11px;border:1px solid #dce4ee;border-radius:9px;background:#fbfcfe;
+  cursor:pointer;
+}
+.event:hover{border-color:#8fa9e4}
+.event-time{font-size:11px;color:var(--blue);font-weight:700}
+.event-name{font-size:13px;font-weight:700;margin:5px 0}
+.event-meta{font-size:11px;color:var(--muted);line-height:1.6}
+.route-wrap{display:grid;grid-template-columns:2fr 1fr;gap:15px}
+.map{
+  height:500px;
+  border-radius:12px;
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg,transparent 49%,#e6eaee 50%,transparent 51%),
+    linear-gradient(0deg,transparent 49%,#e6eaee 50%,transparent 51%),
+    #eef2f4;
+  background-size:80px 80px;
+  border:1px solid var(--line);
+}
+.road{
+  position:absolute;height:7px;background:#cbd3da;border-radius:10px;
+  transform-origin:left center;
+}
+.pin{
+  position:absolute;width:34px;height:34px;border-radius:50%;
+  background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-weight:800;border:4px solid #fff;box-shadow:0 2px 8px #87919b;
+}
+.route-item{
+  padding:14px;border-bottom:1px solid var(--line);
+}
+.route-item:last-child{border-bottom:0}
+.route-item strong{font-size:13px}
+.route-item p{font-size:11px;color:var(--muted);margin:5px 0 0;line-height:1.6}
+.staff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.staff{
+  border:1px solid var(--line);border-radius:10px;padding:14px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.staff input{
+  border:0;border-bottom:1px solid #dbe1e7;font-weight:700;width:120px;padding:5px;
+}
+.switch{font-size:11px;color:var(--green);font-weight:700}
+.modal-bg{
+  position:fixed;inset:0;background:rgba(17,25,35,.42);
+  display:none;align-items:center;justify-content:center;z-index:100;
+}
+.modal-bg.show{display:flex}
+.modal{
+  width:430px;max-width:calc(100% - 30px);
+  background:#fff;border-radius:14px;box-shadow:0 20px 60px #1115;overflow:hidden;
+}
+.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.modal-body{padding:20px}
+.big-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
+.big-card{background:#f5f7fa;border-radius:10px;padding:14px}
+.big-card span{font-size:11px;color:var(--muted)}
+.big-card strong{font-size:22px;display:block;margin-top:5px}
+.close{border:0;background:transparent;font-size:20px}
+.candidate{
+  border:1px solid var(--line);padding:12px;border-radius:9px;margin-top:8px;
+}
+.candidate strong{font-size:13px}
+.candidate p{font-size:11px;color:var(--muted);margin:5px 0}
+.notice{
+  padding:12px 14px;background:#fff8e8;color:#88601b;border:1px solid #f0dfb8;
+  border-radius:9px;font-size:12px;margin-bottom:14px;
+}
+@media(max-width:1000px){
+  aside{width:180px}
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .schedule-grid{grid-template-columns:repeat(2,1fr)}
+  .route-wrap{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  aside{display:none}
+  main{padding:16px}
+  header{padding:0 15px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .form-grid,.staff-grid{grid-template-columns:1fr}
+  .schedule-grid{grid-template-columns:1fr}
+  .priority{grid-template-columns:60px 1fr}
+  .priority select:last-child{grid-column:2}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">찾아가는 세미나 <small>Auto Scheduling</small></div>
+  <div class="header-right">
+    <span style="font-size:12px;color:#7a8590">일정보기</span>
+    <select id="viewer" onchange="renderSchedule()">
+      <option value="all">전체 담당자</option>
+      <option value="한솔">한솔</option>
+      <option value="담당자 02">담당자 02</option>
+      <option value="담당자 03">담당자 03</option>
+      <option value="담당자 04">담당자 04</option>
+      <option value="담당자 05">담당자 05</option>
+      <option value="담당자 06">담당자 06</option>
+      <option value="담당자 07">담당자 07</option>
+      <option value="담당자 08">담당자 08</option>
+      <option value="담당자 09">담당자 09</option>
+      <option value="담당자 10">담당자 10</option>
+    </select>
+  </div>
+</header>
+
+<div class="layout">
+<aside>
+  <div class="nav active" data-page="dashboard">대시보드</div>
+  <div class="nav" data-page="partners">협력사 리스트</div>
+  <div class="nav" data-page="request">업체 일정 접수</div>
+  <div class="nav" data-page="schedule">배정 일정</div>
+  <div class="nav" data-page="route">동선 지도</div>
+  <div class="nav" data-page="staff">담당자 관리</div>
+</aside>
+
+<main>
+
+<section id="dashboard" class="page active">
+  <div class="title-row">
+    <div>
+      <h1>세미나 배정 현황</h1>
+      <div class="desc">업체 희망일정과 담당자 동선을 기준으로 전체 일정을 관리합니다.</div>
+    </div>
+    <button class="btn primary" onclick="autoAssign()">전체 자동배정</button>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><span>전체 협력사</span><strong>236</strong></div>
+    <div class="kpi"><span>O · 배정 완료</span><strong id="okCount">3</strong></div>
+    <div class="kpi"><span>대기</span><strong id="waitCount">3</strong></div>
+    <div class="kpi"><span>X · 진행 안 함</span><strong id="xCount">1</strong></div>
+    <div class="kpi"><span>담당자</span><strong>10</strong></div>
+  </div>
+
+  <div class="notice">
+    실제 운영 시 고객관리카드의 업체 정보는 고유번호 기준으로 읽기 연동하며, 세미나 일정 데이터는 별도로 저장합니다.
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <strong>이번 배정 요약</strong>
+      <button class="btn" onclick="goPage('schedule')">전체 일정 보기</button>
+    </div>
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>날짜</th><th>담당자</th><th>업체</th><th>지역</th><th>참석/자료</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>12/03 10:00</td><td>한솔</td><td class="company">한솔시공사</td><td>수원</td><td>5명 / 5부</td><td><span class="badge ok">O 배정완료</span></td></tr>
+          <tr><td>12/03 14:00</td><td>한솔</td><td class="company">대한건설</td><td>화성</td><td>7명 / 7부</td><td><span class="badge ok">O 배정완료</span></td></tr>
+          <tr><td>12/04 10:00</td><td>담당자 02</td><td class="company">새빛건설</td><td>용인</td><td>4명 / 4부</td><td><span class="badge ok">O 배정완료</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="partners" class="page">
+  <div class="title-row">
+    <div>
+      <h1>협력사 리스트</h1>
+      <div class="desc">O = 배정/진행 · X = 이번 세미나 진행 안 함 · 대기 = 미접수 또는 미배정</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <input class="search" id="partnerSearch" placeholder="업체명 · 지역 · 고유번호 검색" oninput="filterPartners()">
+    </div>
+    <div style="overflow:auto">
+      <table id="partnerTable">
+        <thead>
+          <tr><th>협력사</th><th>고유번호</th><th>지역</th><th>희망일정</th><th>배정</th><th>상태</th><th>변경</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="request" class="page">
+  <div class="title-row">
+    <div>
+      <h1>업체 일정 접수</h1>
+      <div class="desc">고객관리카드 업체를 검색한 후 해당 지역 운영기간 안에서 희망일시 3개를 등록합니다.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-body">
+      <div class="field">
+        <label>협력사 검색</label>
+        <input class="search" id="companySearch" placeholder="예: 한솔시공사 / HS-0001 / 수원" oninput="searchCompanies()">
+      </div>
+      <div id="companyResults"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="requestForm" style="display:none">
+    <div class="panel-head">
+      <strong id="selectedCompanyName">업체명</strong>
+      <span class="badge wait" id="selectedCompanyId">고유번호</span>
+    </div>
+    <div class="panel-body">
+      <div class="info-box">
+        <div style="font-size:12px;color:#77818d">지역별 세미나 운영 가능기간</div>
+        <strong id="availableRange" style="display:block;margin-top:5px">2026.12.01 ~ 2026.12.05</strong>
+      </div>
+
+      <div style="font-weight:700;margin:18px 0 10px">희망 날짜·시간 3개</div>
+
+      <div class="priority">
+        <strong>1순위</strong>
+        <input type="date" id="d1">
+        <select id="t1"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+      </div>
+      <div class="priority">
+        <strong>2순위</strong>
+        <input type="date" id="d2">
+        <select id="t2"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+      </div>
+      <div class="priority">
+        <strong>3순위</strong>
+        <input type="date" id="d3">
+        <select id="t3"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+      </div>
+
+      <div class="form-grid" style="margin-top:18px">
+        <div class="field">
+          <label>참석 인원</label>
+          <input type="number" id="people" value="5" min="1" oninput="syncMaterial()">
+        </div>
+        <div class="field">
+          <label>준비자료</label>
+          <input id="materials" value="5부" readonly style="background:#f5f7f9">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
+        <button class="btn danger" onclick="markSelectedX()">X 진행 안 함</button>
+        <button class="btn primary" onclick="saveRequest()">희망일정 저장</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="schedule" class="page">
+  <div class="title-row">
+    <div>
+      <h1 id="scheduleTitle">전체 배정 일정</h1>
+      <div class="desc">일정 카드를 클릭하면 참석인원, 자료부수, 주소 및 대타 기능을 확인할 수 있습니다.</div>
+    </div>
+    <button class="btn primary" onclick="autoAssign()">자동배정 다시 계산</button>
+  </div>
+  <div class="schedule-grid" id="scheduleGrid"></div>
+</section>
+
+<section id="route" class="page">
+  <div class="title-row">
+    <div>
+      <h1>이동 동선</h1>
+      <div class="desc">현재는 지도 연동 전 시안입니다. 실제 운영 시 지도 API의 차량 이동시간을 사용합니다.</div>
+    </div>
+    <select class="btn" id="routeStaff" onchange="renderRoute()">
+      <option>한솔</option>
+      <option>담당자 02</option>
+      <option>담당자 03</option>
+    </select>
+  </div>
+
+  <div class="route-wrap">
+    <div class="map">
+      <div class="road" style="width:300px;left:120px;top:170px;transform:rotate(18deg)"></div>
+      <div class="road" style="width:230px;left:405px;top:262px;transform:rotate(-20deg)"></div>
+      <div class="pin" style="left:105px;top:150px">1</div>
+      <div class="pin" style="left:390px;top:240px">2</div>
+      <div class="pin" style="left:605px;top:165px">3</div>
+    </div>
+    <div class="panel" style="margin:0">
+      <div class="panel-head"><strong>한솔 · 12월 3일</strong></div>
+      <div class="route-item"><strong>1. 출발</strong><p>본사 / 기존 일정 위치</p></div>
+      <div class="route-item"><strong>2. 한솔시공사 · 10:00</strong><p>수원 · 참석 5명 · 자료 5부<br>예상 이동 32분</p></div>
+      <div class="route-item"><strong>3. 대한건설 · 14:00</strong><p>화성 · 참석 7명 · 자료 7부<br>이전 업체에서 약 27분</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="staff" class="page">
+  <div class="title-row">
+    <div>
+      <h1>담당자 관리</h1>
+      <div class="desc">기본 10명. 이름은 자유롭게 변경할 수 있으며 하루 최대 방문은 기본 2건입니다.</div>
+    </div>
+    <button class="btn" onclick="addStaff()">+ 담당자 추가</button>
+  </div>
+
+  <div class="notice">
+    담당자 기존 일정 달력은 추후 연동합니다. 자동배정과 대타 찾기에서 기존 일정의 시간과 장소까지 함께 계산하도록 연결할 예정입니다.
+  </div>
+
+  <div class="staff-grid" id="staffGrid"></div>
+</section>
+
+</main>
+</div>
+
+<div class="modal-bg" id="detailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <strong id="modalName">업체 상세</strong>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="modalDate" style="font-size:13px;color:#687481"></div>
+      <div class="big-info">
+        <div class="big-card"><span>참석 인원</span><strong id="modalPeople">5명</strong></div>
+        <div class="big-card"><span>준비 자료</span><strong id="modalMaterial">5부</strong></div>
+      </div>
+      <div class="info-box" id="modalAddress"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn" onclick="findSubstitute()">대타 찾기</button>
+        <button class="btn primary" onclick="alert('일정 수정 기능은 실제 저장 DB 연결 시 활성화됩니다.')">일정 수정</button>
+      </div>
+      <div id="substituteArea"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const companies = [
+ {id:'HS-0001',name:'한솔시공사',region:'수원',address:'경기도 수원시 팔달구',status:'O',choices:3,assign:'12/03 10:00 · 한솔',range:'2026.12.01 ~ 2026.12.05'},
+ {id:'HS-0002',name:'대한건설',region:'화성',address:'경기도 화성시',status:'O',choices:3,assign:'12/03 14:00 · 한솔',range:'2026.12.01 ~ 2026.12.05'},
+ {id:'HS-0003',name:'새빛건설',region:'용인',address:'경기도 용인시',status:'O',choices:3,assign:'12/04 10:00 · 담당자 02',range:'2026.12.01 ~ 2026.12.05'},
+ {id:'HS-0004',name:'미래산업개발',region:'평택',address:'경기도 평택시',status:'대기',choices:0,assign:'-',range:'2026.12.08 ~ 2026.12.12'},
+ {id:'HS-0005',name:'우리건설',region:'천안',address:'충청남도 천안시',status:'X',choices:0,assign:'-',range:'2026.12.08 ~ 2026.12.12'},
+ {id:'HS-0006',name:'삼정건설',region:'오산',address:'경기도 오산시',status:'대기',choices:3,assign:'-',range:'2026.12.01 ~ 2026.12.05'},
+ {id:'HS-0007',name:'제일방수',region:'안산',address:'경기도 안산시',status:'대기',choices:0,assign:'-',range:'2026.12.15 ~ 2026.12.19'}
+];
+
+let staff = [
+ '한솔','담당자 02','담당자 03','담당자 04','담당자 05',
+ '담당자 06','담당자 07','담당자 08','담당자 09','담당자 10'
+];
+
+const events = [
+ {date:'12/03',time:'10:00',staff:'한솔',company:'한솔시공사',region:'수원',people:5,address:'경기도 수원시 팔달구'},
+ {date:'12/03',time:'14:00',staff:'한솔',company:'대한건설',region:'화성',people:7,address:'경기도 화성시'},
+ {date:'12/04',time:'10:00',staff:'담당자 02',company:'새빛건설',region:'용인',people:4,address:'경기도 용인시'},
+ {date:'12/04',time:'14:00',staff:'담당자 03',company:'삼정건설',region:'오산',people:6,address:'경기도 오산시'}
+];
+
+let selectedCompany=null;
+
+document.querySelectorAll('.nav').forEach(n=>{
+ n.addEventListener('click',()=>goPage(n.dataset.page));
+});
+
+function goPage(id){
+ document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+ if(id==='schedule') renderSchedule();
+ if(id==='partners') renderPartners();
+ if(id==='staff') renderStaff();
+}
+
+function renderPartners(list=companies){
+ const tb=document.querySelector('#partnerTable tbody');
+ tb.innerHTML=list.map(c=>`
+ <tr>
+  <td><div class="company">${c.name}</div><div class="sub">${c.address}</div></td>
+  <td>${c.id}</td>
+  <td>${c.region}</td>
+  <td>${c.choices ? c.choices+'개 접수' : '-'}</td>
+  <td>${c.assign}</td>
+  <td>${statusBadge(c.status)}</td>
+  <td>
+   <div class="status-buttons">
+    <button class="mini o ${c.status==='O'?'on':''}" onclick="setStatus('${c.id}','O')">O</button>
+    <button class="mini x ${c.status==='X'?'on':''}" onclick="setStatus('${c.id}','X')">X</button>
+    <button class="btn" style="padding:5px 7px;font-size:10px" onclick="setStatus('${c.id}','대기')">대기</button>
+   </div>
+  </td>
+ </tr>`).join('');
+ updateCounts();
+}
+
+function statusBadge(s){
+ if(s==='O') return '<span class="badge ok">O 배정/진행</span>';
+ if(s==='X') return '<span class="badge no">X 진행 안 함</span>';
+ return '<span class="badge wait">대기</span>';
+}
+
+function setStatus(id,s){
+ const c=companies.find(x=>x.id===id);
+ c.status=s;
+ if(s==='X'){c.assign='-';c.choices=0;}
+ renderPartners();
+}
+
+function filterPartners(){
+ const q=document.getElementById('partnerSearch').value.toLowerCase();
+ renderPartners(companies.filter(c=>
+  c.name.toLowerCase().includes(q)||
+  c.region.toLowerCase().includes(q)||
+  c.id.toLowerCase().includes(q)
+ ));
+}
+
+function updateCounts(){
+ document.getElementById('okCount').textContent=companies.filter(c=>c.status==='O').length;
+ document.getElementById('xCount').textContent=companies.filter(c=>c.status==='X').length;
+ document.getElementById('waitCount').textContent=companies.filter(c=>c.status==='대기').length;
+}
+
+function searchCompanies(){
+ const q=document.getElementById('companySearch').value.toLowerCase().trim();
+ const box=document.getElementById('companyResults');
+ if(!q){box.innerHTML='';return;}
+ const found=companies.filter(c=>
+   c.name.toLowerCase().includes(q)||
+   c.id.toLowerCase().includes(q)||
+   c.region.toLowerCase().includes(q)
+ );
+ box.innerHTML=found.map(c=>`
+   <div class="company-result" onclick="selectCompany('${c.id}')">
+     <div class="company">${c.name}</div>
+     <div class="sub">${c.id} · ${c.region} · ${c.address}</div>
+   </div>`).join('') || '<div class="sub" style="padding:15px">검색 결과가 없습니다.</div>';
+}
+
+function selectCompany(id){
+ selectedCompany=companies.find(c=>c.id===id);
+ document.getElementById('requestForm').style.display='block';
+ document.getElementById('selectedCompanyName').textContent=selectedCompany.name+' · '+selectedCompany.region;
+ document.getElementById('selectedCompanyId').textContent=selectedCompany.id;
+ document.getElementById('availableRange').textContent=selectedCompany.range;
+}
+
+function syncMaterial(){
+ const n=document.getElementById('people').value||0;
+ document.getElementById('materials').value=n+'부';
+}
+
+function saveRequest(){
+ if(!selectedCompany)return;
+ selectedCompany.choices=3;
+ selectedCompany.status='대기';
+ alert(selectedCompany.name+'의 희망일정 3개가 저장되었습니다.\\n참석 인원과 동일하게 자료 부수가 자동 적용됩니다.');
+ renderPartners();
+}
+
+function markSelectedX(){
+ if(!selectedCompany)return;
+ selectedCompany.status='X';
+ selectedCompany.choices=0;
+ selectedCompany.assign='-';
+ alert(selectedCompany.name+'을(를) X 처리했습니다. 자동배정 대상에서 제외됩니다.');
+ renderPartners();
+}
+
+function renderSchedule(){
+ const viewer=document.getElementById('viewer').value;
+ const title=document.getElementById('scheduleTitle');
+ title.textContent=viewer==='all'?'전체 배정 일정':viewer+' · 내 일정';
+ const filtered=viewer==='all'?events:events.filter(e=>e.staff===viewer);
+ const dates=['12/01','12/02','12/03','12/04','12/05'];
+ const grid=document.getElementById('scheduleGrid');
+ grid.innerHTML=dates.map(d=>{
+   const es=filtered.filter(e=>e.date===d);
+   return `<div class="day">
+    <div class="day-head">${d}</div>
+    ${es.length?es.map(e=>`
+      <div class="event" onclick='openEvent(${JSON.stringify(e)})'>
+       <div class="event-time">${e.time} · ${e.staff}</div>
+       <div class="event-name">${e.company}</div>
+       <div class="event-meta">${e.region}<br>참석 ${e.people}명 · 자료 ${e.people}부</div>
+      </div>`).join(''):'<div class="sub" style="padding:14px">배정 없음</div>'}
+   </div>`;
+ }).join('');
+}
+
+function openEvent(e){
+ document.getElementById('modalName').textContent=e.company;
+ document.getElementById('modalDate').textContent=e.date+' '+e.time+' · '+e.staff;
+ document.getElementById('modalPeople').textContent=e.people+'명';
+ document.getElementById('modalMaterial').textContent=e.people+'부';
+ document.getElementById('modalAddress').innerHTML='<strong>주소</strong><div class="sub">'+e.address+'</div>';
+ document.getElementById('substituteArea').innerHTML='';
+ document.getElementById('detailModal').classList.add('show');
+}
+
+function closeModal(){
+ document.getElementById('detailModal').classList.remove('show');
+}
+
+function findSubstitute(){
+ document.getElementById('substituteArea').innerHTML=`
+ <div style="font-weight:700;margin-top:20px">대타 가능 후보</div>
+ <div class="candidate">
+   <strong>담당자 04 · 배정 가능</strong>
+   <p>직전 일정 → 해당 업체 약 28분 · 이후 일정 없음 · 오늘 1건</p>
+   <button class="btn blue" onclick="alert('담당자 04로 대타 배정되었습니다. (시안)')">대타 배정</button>
+ </div>
+ <div class="candidate">
+   <strong>담당자 07 · 배정 가능</strong>
+   <p>현재 위치 → 해당 업체 약 36분 · 다음 일정까지 약 41분 · 도착 가능</p>
+   <button class="btn" onclick="alert('담당자 07로 대타 배정되었습니다. (시안)')">대타 배정</button>
+ </div>
+ <div class="candidate" style="opacity:.6">
+   <strong>담당자 02 · 배정 불가</strong>
+   <p>직전 일정에서 이동 시 약 1시간 12분 · 시간 부족</p>
+ </div>`;
+}
+
+function autoAssign(){
+ const targets=companies.filter(c=>c.status!=='X'&&c.choices>0);
+ alert(
+  '자동배정 시뮬레이션\\n\\n'+
+  '대상 업체: '+targets.length+'개\\n'+
+  '담당자: '+staff.length+'명\\n\\n'+
+  '실제 연결 시 아래 조건을 동시에 계산합니다.\\n'+
+  '• 업체 희망일정 1·2·3순위\\n'+
+  '• 담당자 하루 최대 2건\\n'+
+  '• 기존 담당자 일정\\n'+
+  '• 업체 간 차량 이동시간\\n'+
+  '• 다음 일정 도착 가능 여부\\n'+
+  '• X 업체 자동 제외'
+ );
+}
+
+function renderStaff(){
+ const grid=document.getElementById('staffGrid');
+ grid.innerHTML=staff.map((s,i)=>`
+ <div class="staff">
+   <div>
+    <div class="sub">담당자 ${String(i+1).padStart(2,'0')}</div>
+    <input value="${s}" onchange="renameStaff(${i},this.value)">
+   </div>
+   <div style="text-align:right">
+    <div class="switch">사용 중</div>
+    <div class="sub">1일 최대 2건</div>
+   </div>
+ </div>`).join('');
+}
+
+function renameStaff(i,name){
+ const old=staff[i];
+ staff[i]=name||old;
+ [...document.getElementById('viewer').options].forEach(o=>{
+   if(o.value===old){o.value=staff[i];o.textContent=staff[i];}
+ });
+ events.forEach(e=>{if(e.staff===old)e.staff=staff[i];});
+}
+
+function addStaff(){
+ staff.push('담당자 '+String(staff.length+1).padStart(2,'0'));
+ renderStaff();
+}
+
+function renderRoute(){}
+
+document.getElementById('detailModal').addEventListener('click',e=>{
+ if(e.target.id==='detailModal')closeModal();
+});
+
+renderPartners();
+renderSchedule();
+renderStaff();
+</script>
+</body>
+</html> 
