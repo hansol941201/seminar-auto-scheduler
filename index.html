@@ -48,12 +48,14 @@ header{
   border-radius:8px;
   background:#fff;
 }
+.link-btn{border:0;background:transparent;color:var(--muted);font-size:12px;text-decoration:underline}
 .layout{display:flex;min-height:calc(100vh - 68px)}
 aside{
   width:218px;
   background:#fff;
   border-right:1px solid var(--line);
   padding:22px 14px;
+  flex-shrink:0;
 }
 .nav{
   padding:12px 14px;
@@ -74,6 +76,7 @@ main{flex:1;padding:26px;min-width:0}
   align-items:flex-start;
   gap:15px;
   margin-bottom:22px;
+  flex-wrap:wrap;
 }
 h1{font-size:24px;margin:0 0 6px}
 .desc{font-size:13px;color:var(--muted)}
@@ -84,10 +87,13 @@ h1{font-size:24px;margin:0 0 6px}
   padding:9px 14px;
   font-size:13px;
   font-weight:600;
+  white-space:nowrap;
 }
 .btn.primary{background:var(--navy);border-color:var(--navy);color:white}
 .btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
 .btn.danger{color:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
 .kpis{
   display:grid;
   grid-template-columns:repeat(5,1fr);
@@ -116,6 +122,7 @@ h1{font-size:24px;margin:0 0 6px}
   justify-content:space-between;
   align-items:center;
   gap:10px;
+  flex-wrap:wrap;
 }
 .panel-head strong{font-size:15px}
 .panel-body{padding:18px}
@@ -135,8 +142,9 @@ th{
   text-align:left;
   padding:12px;
   border-bottom:1px solid var(--line);
+  white-space:nowrap;
 }
-td{padding:13px 12px;border-bottom:1px solid #edf0f3}
+td{padding:13px 12px;border-bottom:1px solid #edf0f3;vertical-align:top}
 tr:last-child td{border-bottom:0}
 .company{font-weight:700}
 .sub{font-size:11px;color:var(--muted);margin-top:3px}
@@ -147,17 +155,26 @@ tr:last-child td{border-bottom:0}
   padding:5px 9px;
   font-size:11px;
   font-weight:700;
+  white-space:nowrap;
 }
 .wait{background:#f0f2f5;color:#68727e}
 .ok{background:#e8f7f0;color:#147550}
 .no{background:#fdeeee;color:#c33d3d}
 .status-buttons{display:flex;gap:5px}
 .mini{
-  width:31px;height:29px;border:1px solid var(--line);
-  background:#fff;border-radius:6px;font-weight:800;
+  min-width:31px;height:29px;border:1px solid var(--line);
+  background:#fff;border-radius:6px;font-weight:800;padding:0 6px;white-space:nowrap;
 }
+.mini.w{font-size:11px;font-weight:700}
 .mini.o:hover,.mini.o.on{background:#e8f7f0;color:var(--green);border-color:#b8dfcf}
 .mini.x:hover,.mini.x.on{background:#fdeeee;color:var(--red);border-color:#efc5c5}
+.mini.w:hover,.mini.w.on{background:#eef0f3;color:#4b5560;border-color:#cfd6dd}
+.filter-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-tab{
+  padding:8px 15px;border:1px solid var(--line);border-radius:20px;
+  font-size:12px;font-weight:700;background:#fff;color:#5b6672;
+}
+.filter-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .field label{display:block;font-size:12px;color:#687481;margin-bottom:6px;font-weight:600}
 .field input,.field select{
@@ -188,21 +205,25 @@ tr:last-child td{border-bottom:0}
   margin-bottom:9px;
 }
 .priority strong{font-size:12px}
+.schedule-scroll{overflow-x:auto;padding-bottom:6px}
 .schedule-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-auto-flow:column;
+  grid-auto-columns:230px;
   gap:12px;
 }
 .day{
-  background:#fff;border:1px solid var(--line);border-radius:11px;min-height:320px;
+  background:#fff;border:1px solid var(--line);border-radius:11px;min-height:200px;
 }
-.day-head{padding:13px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px}
+.day-head{padding:13px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.day-head span{font-size:10px;color:var(--muted);font-weight:500}
 .event{
   margin:10px;padding:11px;border:1px solid #dce4ee;border-radius:9px;background:#fbfcfe;
   cursor:pointer;
 }
 .event:hover{border-color:#8fa9e4}
-.event-time{font-size:11px;color:var(--blue);font-weight:700}
+.event.draft{border-style:dashed;border-color:#c9b26a;background:#fffdf6}
+.event-time{font-size:11px;color:var(--blue);font-weight:700;display:flex;justify-content:space-between}
 .event-name{font-size:13px;font-weight:700;margin:5px 0}
 .event-meta{font-size:11px;color:var(--muted);line-height:1.6}
 .route-wrap{display:grid;grid-template-columns:2fr 1fr;gap:15px}
@@ -219,13 +240,13 @@ tr:last-child td{border-bottom:0}
   border:1px solid var(--line);
 }
 .road{
-  position:absolute;height:7px;background:#cbd3da;border-radius:10px;
+  position:absolute;height:6px;background:#cbd3da;border-radius:10px;
   transform-origin:left center;
 }
 .pin{
   position:absolute;width:34px;height:34px;border-radius:50%;
   background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;
-  font-weight:800;border:4px solid #fff;box-shadow:0 2px 8px #87919b;
+  font-weight:800;border:4px solid #fff;box-shadow:0 2px 8px #87919b;font-size:13px;
 }
 .route-item{
   padding:14px;border-bottom:1px solid var(--line);
@@ -236,50 +257,68 @@ tr:last-child td{border-bottom:0}
 .staff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .staff{
   border:1px solid var(--line);border-radius:10px;padding:14px;
-  display:flex;align-items:center;justify-content:space-between;
 }
-.staff input{
-  border:0;border-bottom:1px solid #dbe1e7;font-weight:700;width:120px;padding:5px;
+.staff-top{display:flex;align-items:center;justify-content:space-between}
+.staff input.name-input{
+  border:0;border-bottom:1px solid #dbe1e7;font-weight:700;width:130px;padding:5px;background:transparent;
 }
-.switch{font-size:11px;color:var(--green);font-weight:700}
+.staff.inactive{opacity:.55}
+.staff-row-extra{margin-top:10px;display:flex;justify-content:space-between;align-items:center}
+.toggle{width:38px;height:22px;border-radius:20px;background:#dfe4ea;position:relative;border:none;padding:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.15s}
+.toggle.on::after{left:18px}
+.maxday-input{width:44px;text-align:center;border:1px solid var(--line);border-radius:6px;padding:4px}
 .modal-bg{
   position:fixed;inset:0;background:rgba(17,25,35,.42);
   display:none;align-items:center;justify-content:center;z-index:100;
 }
 .modal-bg.show{display:flex}
 .modal{
-  width:430px;max-width:calc(100% - 30px);
+  width:440px;max-width:calc(100% - 30px);
   background:#fff;border-radius:14px;box-shadow:0 20px 60px #1115;overflow:hidden;
+  max-height:calc(100vh - 40px);overflow-y:auto;
 }
-.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
 .modal-body{padding:20px}
 .big-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
 .big-card{background:#f5f7fa;border-radius:10px;padding:14px}
 .big-card span{font-size:11px;color:var(--muted)}
 .big-card strong{font-size:22px;display:block;margin-top:5px}
-.close{border:0;background:transparent;font-size:20px}
+.close{border:0;background:transparent;font-size:20px;color:#77818d}
 .candidate{
   border:1px solid var(--line);padding:12px;border-radius:9px;margin-top:8px;
 }
+.candidate.infeasible{opacity:.55}
 .candidate strong{font-size:13px}
 .candidate p{font-size:11px;color:var(--muted);margin:5px 0}
 .notice{
   padding:12px 14px;background:#fff8e8;color:#88601b;border:1px solid #f0dfb8;
   border-radius:9px;font-size:12px;margin-bottom:14px;
 }
+.tag-demo{display:inline-block;font-size:10px;font-weight:800;color:#8a5b12;background:#fff2d9;border:1px solid #f0dfb8;border-radius:5px;padding:2px 6px;margin-left:6px;vertical-align:middle}
+.draft-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #edf0f3;font-size:13px;gap:10px;flex-wrap:wrap}
+.draft-row:last-child{border-bottom:0}
+.pill{font-size:11px;padding:3px 8px;border-radius:12px;background:#eef2f7;color:#55606c;font-weight:700}
+.region-row td input{width:150px}
+.field-inline{display:flex;gap:8px;align-items:center}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 @media(max-width:1000px){
   aside{width:180px}
   .kpis{grid-template-columns:repeat(3,1fr)}
-  .schedule-grid{grid-template-columns:repeat(2,1fr)}
   .route-wrap{grid-template-columns:1fr}
 }
 @media(max-width:720px){
-  aside{display:none}
+  .layout{flex-direction:column}
+  aside{
+    width:100%;display:flex;gap:6px;overflow-x:auto;
+    padding:10px 12px;border-right:0;border-bottom:1px solid var(--line);
+  }
+  .nav{white-space:nowrap;margin-bottom:0;flex-shrink:0}
+  header{padding:0 15px;height:auto;min-height:68px;flex-wrap:wrap;gap:8px;padding-top:10px;padding-bottom:10px}
   main{padding:16px}
-  header{padding:0 15px}
   .kpis{grid-template-columns:1fr 1fr}
-  .form-grid,.staff-grid{grid-template-columns:1fr}
-  .schedule-grid{grid-template-columns:1fr}
+  .form-grid,.staff-grid,.edit-grid{grid-template-columns:1fr}
   .priority{grid-template-columns:60px 1fr}
   .priority select:last-child{grid-column:2}
 }
@@ -288,22 +327,11 @@ tr:last-child td{border-bottom:0}
 <body>
 
 <header>
-  <div class="logo">찾아가는 세미나 <small>Auto Scheduling</small></div>
+  <div class="logo">찾아가는 세미나 <small>Auto Scheduling · DEMO</small></div>
   <div class="header-right">
     <span style="font-size:12px;color:#7a8590">일정보기</span>
-    <select id="viewer" onchange="renderSchedule()">
-      <option value="all">전체 담당자</option>
-      <option value="한솔">한솔</option>
-      <option value="담당자 02">담당자 02</option>
-      <option value="담당자 03">담당자 03</option>
-      <option value="담당자 04">담당자 04</option>
-      <option value="담당자 05">담당자 05</option>
-      <option value="담당자 06">담당자 06</option>
-      <option value="담당자 07">담당자 07</option>
-      <option value="담당자 08">담당자 08</option>
-      <option value="담당자 09">담당자 09</option>
-      <option value="담당자 10">담당자 10</option>
-    </select>
+    <select id="viewer" onchange="renderSchedulePage()"></select>
+    <button class="link-btn" onclick="resetDemoData()">샘플 데이터 초기화</button>
   </div>
 </header>
 
@@ -311,6 +339,7 @@ tr:last-child td{border-bottom:0}
 <aside>
   <div class="nav active" data-page="dashboard">대시보드</div>
   <div class="nav" data-page="partners">협력사 리스트</div>
+  <div class="nav" data-page="regions">지역별 운영기간</div>
   <div class="nav" data-page="request">업체 일정 접수</div>
   <div class="nav" data-page="schedule">배정 일정</div>
   <div class="nav" data-page="route">동선 지도</div>
@@ -325,34 +354,30 @@ tr:last-child td{border-bottom:0}
       <h1>세미나 배정 현황</h1>
       <div class="desc">업체 희망일정과 담당자 동선을 기준으로 전체 일정을 관리합니다.</div>
     </div>
-    <button class="btn primary" onclick="autoAssign()">전체 자동배정</button>
+    <button class="btn primary" onclick="goPage('schedule');generateDraftPlan()">전체 자동배정</button>
   </div>
 
   <div class="kpis">
-    <div class="kpi"><span>전체 협력사</span><strong>236</strong></div>
-    <div class="kpi"><span>O · 배정 완료</span><strong id="okCount">3</strong></div>
-    <div class="kpi"><span>대기</span><strong id="waitCount">3</strong></div>
-    <div class="kpi"><span>X · 진행 안 함</span><strong id="xCount">1</strong></div>
-    <div class="kpi"><span>담당자</span><strong>10</strong></div>
+    <div class="kpi"><span>전체 협력사</span><strong id="kpiTotal">0</strong></div>
+    <div class="kpi"><span>O · 배정/진행</span><strong id="okCount">0</strong></div>
+    <div class="kpi"><span>대기</span><strong id="waitCount">0</strong></div>
+    <div class="kpi"><span>X · 진행 안 함</span><strong id="xCount">0</strong></div>
+    <div class="kpi"><span>담당자</span><strong id="staffCount">0</strong></div>
   </div>
 
   <div class="notice">
-    실제 운영 시 고객관리카드의 업체 정보는 고유번호 기준으로 읽기 연동하며, 세미나 일정 데이터는 별도로 저장합니다.
+    실제 운영 시 고객관리카드의 업체 정보는 <b>업체 고유번호</b> 기준으로 읽기 연동하며, 세미나 전용 데이터(희망일정·배정·참석인원)는 별도로 저장합니다. 현재 화면의 업체/일정 데이터는 모두 DEMO 샘플이며 브라우저 localStorage에만 저장됩니다.
   </div>
 
   <div class="panel">
     <div class="panel-head">
-      <strong>이번 배정 요약</strong>
+      <strong>이번 배정 요약 (확정된 일정)</strong>
       <button class="btn" onclick="goPage('schedule')">전체 일정 보기</button>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="padding:0">
       <table>
-        <thead><tr><th>날짜</th><th>담당자</th><th>업체</th><th>지역</th><th>참석/자료</th><th>상태</th></tr></thead>
-        <tbody>
-          <tr><td>12/03 10:00</td><td>한솔</td><td class="company">한솔시공사</td><td>수원</td><td>5명 / 5부</td><td><span class="badge ok">O 배정완료</span></td></tr>
-          <tr><td>12/03 14:00</td><td>한솔</td><td class="company">대한건설</td><td>화성</td><td>7명 / 7부</td><td><span class="badge ok">O 배정완료</span></td></tr>
-          <tr><td>12/04 10:00</td><td>담당자 02</td><td class="company">새빛건설</td><td>용인</td><td>4명 / 4부</td><td><span class="badge ok">O 배정완료</span></td></tr>
-        </tbody>
+        <thead><tr><th>날짜</th><th>시간</th><th>담당자</th><th>업체</th><th>지역</th><th>참석/자료</th><th>상태</th></tr></thead>
+        <tbody id="dashboardTable"></tbody>
       </table>
     </div>
   </div>
@@ -362,13 +387,15 @@ tr:last-child td{border-bottom:0}
   <div class="title-row">
     <div>
       <h1>협력사 리스트</h1>
-      <div class="desc">O = 배정/진행 · X = 이번 세미나 진행 안 함 · 대기 = 미접수 또는 미배정</div>
+      <div class="desc">O = 배정/진행 · X = 이번 세미나 진행 안 함 · 대기 = 미접수 또는 미배정. X 업체는 자동배정 대상에서 제외됩니다.</div>
     </div>
   </div>
 
+  <div class="filter-tabs" id="partnerFilterTabs"></div>
+
   <div class="panel">
     <div class="panel-head">
-      <input class="search" id="partnerSearch" placeholder="업체명 · 지역 · 고유번호 검색" oninput="filterPartners()">
+      <input class="search" id="partnerSearch" placeholder="업체명 · 지역 · 고유번호 검색" oninput="renderPartners()">
     </div>
     <div style="overflow:auto">
       <table id="partnerTable">
@@ -376,6 +403,23 @@ tr:last-child td{border-bottom:0}
           <tr><th>협력사</th><th>고유번호</th><th>지역</th><th>희망일정</th><th>배정</th><th>상태</th><th>변경</th></tr>
         </thead>
         <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="regions" class="page">
+  <div class="title-row">
+    <div>
+      <h1>지역별 세미나 운영기간</h1>
+      <div class="desc">지역별 방문 가능 기간을 관리합니다. 업체 일정 접수 시 이 기간 안에서만 희망일시를 선택할 수 있습니다.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div style="overflow:auto">
+      <table>
+        <thead><tr><th>지역</th><th>시작일</th><th>종료일</th><th>해당 협력사 수</th><th></th></tr></thead>
+        <tbody id="regionTable"></tbody>
       </table>
     </div>
   </div>
@@ -407,7 +451,8 @@ tr:last-child td{border-bottom:0}
     <div class="panel-body">
       <div class="info-box">
         <div style="font-size:12px;color:#77818d">지역별 세미나 운영 가능기간</div>
-        <strong id="availableRange" style="display:block;margin-top:5px">2026.12.01 ~ 2026.12.05</strong>
+        <strong id="availableRange" style="display:block;margin-top:5px">-</strong>
+        <div class="sub" id="selectedCompanyMeta" style="margin-top:8px"></div>
       </div>
 
       <div style="font-weight:700;margin:18px 0 10px">희망 날짜·시간 3개</div>
@@ -415,17 +460,17 @@ tr:last-child td{border-bottom:0}
       <div class="priority">
         <strong>1순위</strong>
         <input type="date" id="d1">
-        <select id="t1"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+        <select id="t1"></select>
       </div>
       <div class="priority">
         <strong>2순위</strong>
         <input type="date" id="d2">
-        <select id="t2"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+        <select id="t2"></select>
       </div>
       <div class="priority">
         <strong>3순위</strong>
         <input type="date" id="d3">
-        <select id="t3"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+        <select id="t3"></select>
       </div>
 
       <div class="form-grid" style="margin-top:18px">
@@ -434,7 +479,7 @@ tr:last-child td{border-bottom:0}
           <input type="number" id="people" value="5" min="1" oninput="syncMaterial()">
         </div>
         <div class="field">
-          <label>준비자료</label>
+          <label>준비자료 (자동 계산)</label>
           <input id="materials" value="5부" readonly style="background:#f5f7f9">
         </div>
       </div>
@@ -453,37 +498,35 @@ tr:last-child td{border-bottom:0}
       <h1 id="scheduleTitle">전체 배정 일정</h1>
       <div class="desc">일정 카드를 클릭하면 참석인원, 자료부수, 주소 및 대타 기능을 확인할 수 있습니다.</div>
     </div>
-    <button class="btn primary" onclick="autoAssign()">자동배정 다시 계산</button>
+    <div class="btn-row">
+      <button class="btn primary" onclick="generateDraftPlan()">자동배정안 생성</button>
+    </div>
   </div>
-  <div class="schedule-grid" id="scheduleGrid"></div>
+
+  <div id="draftPanel"></div>
+
+  <div class="schedule-scroll">
+    <div class="schedule-grid" id="scheduleGrid"></div>
+  </div>
 </section>
 
 <section id="route" class="page">
   <div class="title-row">
     <div>
       <h1>이동 동선</h1>
-      <div class="desc">현재는 지도 연동 전 시안입니다. 실제 운영 시 지도 API의 차량 이동시간을 사용합니다.</div>
+      <div class="desc">현재는 지도 API 연동 전 시안입니다. 표시되는 거리·이동시간은 모두 <b>DEMO 값</b>이며, 실제 운영 시 Kakao/Naver Maps API의 차량 이동 데이터로 교체될 예정입니다.</div>
     </div>
-    <select class="btn" id="routeStaff" onchange="renderRoute()">
-      <option>한솔</option>
-      <option>담당자 02</option>
-      <option>담당자 03</option>
-    </select>
+    <div class="btn-row">
+      <select class="btn" id="routeStaff" onchange="document.getElementById('routeDate').dataset.staff='';renderRoute()"></select>
+      <select class="btn" id="routeDate" onchange="renderRoute()"></select>
+    </div>
   </div>
 
   <div class="route-wrap">
-    <div class="map">
-      <div class="road" style="width:300px;left:120px;top:170px;transform:rotate(18deg)"></div>
-      <div class="road" style="width:230px;left:405px;top:262px;transform:rotate(-20deg)"></div>
-      <div class="pin" style="left:105px;top:150px">1</div>
-      <div class="pin" style="left:390px;top:240px">2</div>
-      <div class="pin" style="left:605px;top:165px">3</div>
-    </div>
+    <div class="map" id="routeMap"></div>
     <div class="panel" style="margin:0">
-      <div class="panel-head"><strong>한솔 · 12월 3일</strong></div>
-      <div class="route-item"><strong>1. 출발</strong><p>본사 / 기존 일정 위치</p></div>
-      <div class="route-item"><strong>2. 한솔시공사 · 10:00</strong><p>수원 · 참석 5명 · 자료 5부<br>예상 이동 32분</p></div>
-      <div class="route-item"><strong>3. 대한건설 · 14:00</strong><p>화성 · 참석 7명 · 자료 7부<br>이전 업체에서 약 27분</p></div>
+      <div class="panel-head"><strong id="routeTitle">동선</strong></div>
+      <div id="routeList"></div>
     </div>
   </div>
 </section>
@@ -492,16 +535,22 @@ tr:last-child td{border-bottom:0}
   <div class="title-row">
     <div>
       <h1>담당자 관리</h1>
-      <div class="desc">기본 10명. 이름은 자유롭게 변경할 수 있으며 하루 최대 방문은 기본 2건입니다.</div>
+      <div class="desc">기본 10명. 표시 이름과 내부 담당자ID는 분리되어 있어 이름을 바꿔도 기존 일정 연결이 깨지지 않습니다. 하루 최대 방문 기본값은 2건입니다.</div>
     </div>
     <button class="btn" onclick="addStaff()">+ 담당자 추가</button>
   </div>
 
-  <div class="notice">
-    담당자 기존 일정 달력은 추후 연동합니다. 자동배정과 대타 찾기에서 기존 일정의 시간과 장소까지 함께 계산하도록 연결할 예정입니다.
-  </div>
-
   <div class="staff-grid" id="staffGrid"></div>
+
+  <div class="panel" style="margin-top:18px">
+    <div class="panel-head"><strong>기존 직원 일정 연동 (예정)</strong></div>
+    <div class="panel-body">
+      <div class="notice" style="margin-bottom:0">
+        회사에서 사용 중인 기존 직원 일정 달력과의 연동 방식은 아직 확정되지 않았습니다. 연동 전까지는 세미나 시스템 내 배정 일정만으로 자동배정·대타 계산을 수행합니다.<br><br>
+        연동 시 아래 정보를 함께 계산하도록 데이터 구조가 이미 분리되어 있습니다 (<code>externalStaffCalendar</code>): 기존 일정 시간, 기존 일정 장소, 일정 종료시간, 다음 일정, 이동시간. 임의로 특정 캘린더 API를 연결하지 않았습니다.
+      </div>
+    </div>
+  </div>
 </section>
 
 </main>
@@ -513,47 +562,207 @@ tr:last-child td{border-bottom:0}
       <strong id="modalName">업체 상세</strong>
       <button class="close" onclick="closeModal()">×</button>
     </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="xReasonModal">
+  <div class="modal">
+    <div class="modal-head">
+      <strong>X 처리 사유</strong>
+      <button class="close" onclick="closeXReasonModal()">×</button>
+    </div>
     <div class="modal-body">
-      <div id="modalDate" style="font-size:13px;color:#687481"></div>
-      <div class="big-info">
-        <div class="big-card"><span>참석 인원</span><strong id="modalPeople">5명</strong></div>
-        <div class="big-card"><span>준비 자료</span><strong id="modalMaterial">5부</strong></div>
+      <div class="field">
+        <label>사유 선택</label>
+        <select id="xReasonSelect">
+          <option>일정 불가</option>
+          <option>참여 의사 없음</option>
+          <option>연락 안 됨</option>
+          <option>기타</option>
+        </select>
       </div>
-      <div class="info-box" id="modalAddress"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn" onclick="findSubstitute()">대타 찾기</button>
-        <button class="btn primary" onclick="alert('일정 수정 기능은 실제 저장 DB 연결 시 활성화됩니다.')">일정 수정</button>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px">
+        <button class="btn" onclick="closeXReasonModal()">취소</button>
+        <button class="btn danger" onclick="confirmXReason()">X로 처리</button>
       </div>
-      <div id="substituteArea"></div>
     </div>
   </div>
 </div>
 
 <script>
-const companies = [
- {id:'HS-0001',name:'한솔시공사',region:'수원',address:'경기도 수원시 팔달구',status:'O',choices:3,assign:'12/03 10:00 · 한솔',range:'2026.12.01 ~ 2026.12.05'},
- {id:'HS-0002',name:'대한건설',region:'화성',address:'경기도 화성시',status:'O',choices:3,assign:'12/03 14:00 · 한솔',range:'2026.12.01 ~ 2026.12.05'},
- {id:'HS-0003',name:'새빛건설',region:'용인',address:'경기도 용인시',status:'O',choices:3,assign:'12/04 10:00 · 담당자 02',range:'2026.12.01 ~ 2026.12.05'},
- {id:'HS-0004',name:'미래산업개발',region:'평택',address:'경기도 평택시',status:'대기',choices:0,assign:'-',range:'2026.12.08 ~ 2026.12.12'},
- {id:'HS-0005',name:'우리건설',region:'천안',address:'충청남도 천안시',status:'X',choices:0,assign:'-',range:'2026.12.08 ~ 2026.12.12'},
- {id:'HS-0006',name:'삼정건설',region:'오산',address:'경기도 오산시',status:'대기',choices:3,assign:'-',range:'2026.12.01 ~ 2026.12.05'},
- {id:'HS-0007',name:'제일방수',region:'안산',address:'경기도 안산시',status:'대기',choices:0,assign:'-',range:'2026.12.15 ~ 2026.12.19'}
+/* =====================================================================
+   DEMO DATA
+   - 아래 데이터는 전부 샘플(DEMO)입니다. 실제 연동 시 고객관리카드에서
+     업체 고유번호(corpId)를 PK/FK로 사용해 읽어오도록 구조를 맞췄습니다.
+   ===================================================================== */
+const STORAGE_KEY = 'seminarSchedulerState_v2';
+const TIME_SLOTS = ['10:00','14:00','16:00'];
+const SEMINAR_DURATION_MIN = 60; // DEMO: 세미나 1건 평균 진행시간(분). 실제 값으로 교체 예정.
+
+const DEFAULT_REGIONS = [
+ {id:'suwon',      name:'수원', start:'2026-12-01', end:'2026-12-05'},
+ {id:'hwaseong',   name:'화성', start:'2026-12-01', end:'2026-12-05'},
+ {id:'yongin',     name:'용인', start:'2026-12-01', end:'2026-12-05'},
+ {id:'osan',       name:'오산', start:'2026-12-01', end:'2026-12-05'},
+ {id:'pyeongtaek', name:'평택', start:'2026-12-08', end:'2026-12-12'},
+ {id:'cheonan',    name:'천안', start:'2026-12-08', end:'2026-12-12'},
+ {id:'ansan',      name:'안산', start:'2026-12-15', end:'2026-12-19'},
 ];
 
-let staff = [
- '한솔','담당자 02','담당자 03','담당자 04','담당자 05',
- '담당자 06','담당자 07','담당자 08','담당자 09','담당자 10'
+function defaultStaff(){
+  const list=[{staffId:'STAFF-001',name:'한솔',active:true,maxPerDay:2}];
+  for(let i=2;i<=10;i++){
+    list.push({staffId:'STAFF-'+String(i).padStart(3,'0'),name:'담당자 '+String(i).padStart(2,'0'),active:true,maxPerDay:2});
+  }
+  return list;
+}
+
+const DEFAULT_COMPANIES = [
+ {corpId:'HS-0001',name:'한솔시공사',regionId:'suwon',address:'경기도 수원시 팔달구 매산로 10',contact:'031-200-1001',email:'hs-0001@partner-demo.co.kr',
+  status:'O',xReason:null,attendees:5,
+  requests:[{priority:1,date:'2026-12-03',time:'10:00'},{priority:2,date:'2026-12-04',time:'14:00'},{priority:3,date:'2026-12-05',time:'10:00'}],
+  assignment:{date:'2026-12-03',time:'10:00',staffId:'STAFF-001'}},
+ {corpId:'HS-0002',name:'대한건설',regionId:'hwaseong',address:'경기도 화성시 동탄대로 55',contact:'031-200-1002',email:'hs-0002@partner-demo.co.kr',
+  status:'O',xReason:null,attendees:7,
+  requests:[{priority:1,date:'2026-12-03',time:'14:00'},{priority:2,date:'2026-12-04',time:'10:00'},{priority:3,date:'2026-12-05',time:'14:00'}],
+  assignment:{date:'2026-12-03',time:'14:00',staffId:'STAFF-001'}},
+ {corpId:'HS-0003',name:'새빛건설',regionId:'yongin',address:'경기도 용인시 기흥구 동백중앙로 21',contact:'031-200-1003',email:'hs-0003@partner-demo.co.kr',
+  status:'O',xReason:null,attendees:4,
+  requests:[{priority:1,date:'2026-12-04',time:'10:00'},{priority:2,date:'2026-12-04',time:'16:00'},{priority:3,date:'2026-12-05',time:'10:00'}],
+  assignment:{date:'2026-12-04',time:'10:00',staffId:'STAFF-002'}},
+ {corpId:'HS-0004',name:'미래산업개발',regionId:'pyeongtaek',address:'경기도 평택시 평택로 88',contact:'031-200-1004',email:'hs-0004@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:null,requests:[],assignment:null},
+ {corpId:'HS-0005',name:'우리건설',regionId:'cheonan',address:'충청남도 천안시 서북구 번영로 12',contact:'041-200-1005',email:'hs-0005@partner-demo.co.kr',
+  status:'X',xReason:'일정 불가',attendees:null,requests:[],assignment:null},
+ {corpId:'HS-0006',name:'삼정건설',regionId:'osan',address:'경기도 오산시 오산로 45',contact:'031-200-1006',email:'hs-0006@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:6,
+  requests:[{priority:1,date:'2026-12-04',time:'10:00'},{priority:2,date:'2026-12-04',time:'14:00'},{priority:3,date:'2026-12-05',time:'10:00'}],
+  assignment:null},
+ {corpId:'HS-0007',name:'제일방수',regionId:'ansan',address:'경기도 안산시 단원구 광덕서로 9',contact:'031-200-1007',email:'hs-0007@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:null,requests:[],assignment:null},
+ {corpId:'HS-0008',name:'동방기업',regionId:'suwon',address:'경기도 수원시 영통구 광교로 130',contact:'031-200-1008',email:'hs-0008@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:3,
+  requests:[{priority:1,date:'2026-12-03',time:'10:00'},{priority:2,date:'2026-12-03',time:'14:00'},{priority:3,date:'2026-12-04',time:'10:00'}],
+  assignment:null},
+ {corpId:'HS-0009',name:'청호엔지니어링',regionId:'hwaseong',address:'경기도 화성시 향남읍 발안로 77',contact:'031-200-1009',email:'hs-0009@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:8,
+  requests:[{priority:1,date:'2026-12-03',time:'14:00'},{priority:2,date:'2026-12-04',time:'14:00'},{priority:3,date:'2026-12-05',time:'10:00'}],
+  assignment:null},
+ {corpId:'HS-0010',name:'대성토건',regionId:'yongin',address:'경기도 용인시 수지구 성복로 3',contact:'031-200-1010',email:'hs-0010@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:5,
+  requests:[{priority:1,date:'2026-12-04',time:'10:00'},{priority:2,date:'2026-12-04',time:'16:00'},{priority:3,date:'2026-12-05',time:'10:00'}],
+  assignment:null},
+ {corpId:'HS-0011',name:'서일산업',regionId:'osan',address:'경기도 오산시 성호대로 18',contact:'031-200-1011',email:'hs-0011@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:4,
+  requests:[{priority:1,date:'2026-12-01',time:'10:00'},{priority:2,date:'2026-12-02',time:'14:00'},{priority:3,date:'2026-12-03',time:'10:00'}],
+  assignment:null},
+ {corpId:'HS-0012',name:'한빛개발',regionId:'pyeongtaek',address:'경기도 평택시 서동대로 210',contact:'031-200-1012',email:'hs-0012@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:6,
+  requests:[{priority:1,date:'2026-12-09',time:'10:00'},{priority:2,date:'2026-12-10',time:'14:00'},{priority:3,date:'2026-12-11',time:'10:00'}],
+  assignment:null},
+ {corpId:'HS-0013',name:'미래건설산업',regionId:'cheonan',address:'충청남도 천안시 동남구 청수로 5',contact:'041-200-1013',email:'hs-0013@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:3,
+  requests:[{priority:1,date:'2026-12-09',time:'14:00'},{priority:2,date:'2026-12-10',time:'10:00'},{priority:3,date:'2026-12-11',time:'14:00'}],
+  assignment:null},
+ {corpId:'HS-0014',name:'대원종합건설',regionId:'ansan',address:'경기도 안산시 상록구 본오로 60',contact:'031-200-1014',email:'hs-0014@partner-demo.co.kr',
+  status:'대기',xReason:null,attendees:7,
+  requests:[{priority:1,date:'2026-12-16',time:'10:00'},{priority:2,date:'2026-12-17',time:'14:00'},{priority:3,date:'2026-12-18',time:'10:00'}],
+  assignment:null},
 ];
 
-const events = [
- {date:'12/03',time:'10:00',staff:'한솔',company:'한솔시공사',region:'수원',people:5,address:'경기도 수원시 팔달구'},
- {date:'12/03',time:'14:00',staff:'한솔',company:'대한건설',region:'화성',people:7,address:'경기도 화성시'},
- {date:'12/04',time:'10:00',staff:'담당자 02',company:'새빛건설',region:'용인',people:4,address:'경기도 용인시'},
- {date:'12/04',time:'14:00',staff:'담당자 03',company:'삼정건설',region:'오산',people:6,address:'경기도 오산시'}
-];
+/* 기존 직원 일정 시스템과의 향후 연동을 위한 placeholder 구조.
+   연동 방식이 정해지지 않았으므로 임의의 API를 붙이지 않고,
+   자동배정/대타 계산이 참조할 수 있는 빈 인터페이스만 정의한다. */
+const externalStaffCalendar = {
+  connected:false,
+  note:'기존 직원 일정 연동 예정 (연동 방식 미정)',
+  // staffId -> [{date:'YYYY-MM-DD', start:'HH:MM', end:'HH:MM', location:'', title:''}]
+  events:{}
+};
 
-let selectedCompany=null;
+/* =====================================================================
+   STATE (localStorage 영속화)
+   ===================================================================== */
+let regions, staff, companies, draftPlan;
 
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      regions = s.regions; staff = s.staff; companies = s.companies; draftPlan = s.draftPlan || null;
+      return;
+    }
+  }catch(e){ console.warn('저장된 데이터를 불러오지 못해 샘플 데이터로 시작합니다.', e); }
+  regions = JSON.parse(JSON.stringify(DEFAULT_REGIONS));
+  staff = defaultStaff();
+  companies = JSON.parse(JSON.stringify(DEFAULT_COMPANIES));
+  draftPlan = null;
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({regions,staff,companies,draftPlan}));
+}
+
+function resetDemoData(){
+  if(!confirm('모든 변경사항을 지우고 샘플 데이터로 초기화할까요?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  loadState();
+  renderAll();
+}
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function findCompany(id){ return companies.find(c=>c.corpId===id); }
+function findStaff(id){ return staff.find(s=>s.staffId===id); }
+function findRegion(id){ return regions.find(r=>r.id===id); }
+function fmtDateLabel(iso){ return iso.slice(5).replace('-','/'); } // 2026-12-03 -> 12/03
+function fmtDateFull(iso){ return iso.replaceAll('-','.'); }
+function timeToMinutes(t){ const[h,m]=t.split(':').map(Number); return h*60+m; }
+function minutesToLabel(m){
+  if(m<60) return m+'분';
+  const h=Math.floor(m/60), mm=m%60;
+  return h+'시간'+(mm?' '+mm+'분':'');
+}
+
+function statusBadge(s){
+  if(s==='O') return '<span class="badge ok">O 배정/진행</span>';
+  if(s==='X') return '<span class="badge no">X 진행 안 함</span>';
+  return '<span class="badge wait">대기</span>';
+}
+
+/* DEMO 이동시간 계산. 실제 연동 시 Kakao/Naver Maps API의 차량 이동
+   거리/시간 값으로 이 함수만 교체하면 되도록 다른 로직과 분리했다.
+   loc은 'HQ'(본사) 또는 corpId. */
+function demoTravelMinutes(fromLoc, toLoc){
+  if(fromLoc===toLoc) return 0;
+  const regionOf = loc => loc==='HQ' ? null : (findCompany(loc)? findCompany(loc).regionId : null);
+  const sameRegion = regionOf(fromLoc) && regionOf(fromLoc)===regionOf(toLoc);
+  const str = fromLoc+'>'+toLoc;
+  let hash=0;
+  for(let i=0;i<str.length;i++){ hash=(hash*33 + str.charCodeAt(i)) >>> 0; }
+  return sameRegion ? 12+(hash%20) : 30+(hash%40);
+}
+
+/* =====================================================================
+   일정 조회 (확정 + 초안)
+   ===================================================================== */
+function getConfirmedEvents(){
+  return companies.filter(c=>c.assignment).map(c=>({corpId:c.corpId, date:c.assignment.date, time:c.assignment.time, staffId:c.assignment.staffId}));
+}
+function getStaffDayEvents(staffId, date, includeDraft){
+  let list = getConfirmedEvents().filter(e=>e.staffId===staffId && e.date===date);
+  if(includeDraft && draftPlan){
+    list = list.concat(draftPlan.assignments.filter(a=>a.staffId===staffId && a.date===date));
+  }
+  return list.sort((a,b)=>a.time.localeCompare(b.time));
+}
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
 document.querySelectorAll('.nav').forEach(n=>{
  n.addEventListener('click',()=>goPage(n.dataset.page));
 });
@@ -561,214 +770,792 @@ document.querySelectorAll('.nav').forEach(n=>{
 function goPage(id){
  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));
  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
- if(id==='schedule') renderSchedule();
+ if(id==='dashboard') renderDashboard();
  if(id==='partners') renderPartners();
+ if(id==='regions') renderRegions();
+ if(id==='schedule') renderSchedulePage();
+ if(id==='route') renderRoute();
  if(id==='staff') renderStaff();
 }
 
-function renderPartners(list=companies){
- const tb=document.querySelector('#partnerTable tbody');
- tb.innerHTML=list.map(c=>`
- <tr>
-  <td><div class="company">${c.name}</div><div class="sub">${c.address}</div></td>
-  <td>${c.id}</td>
-  <td>${c.region}</td>
-  <td>${c.choices ? c.choices+'개 접수' : '-'}</td>
-  <td>${c.assign}</td>
-  <td>${statusBadge(c.status)}</td>
-  <td>
-   <div class="status-buttons">
-    <button class="mini o ${c.status==='O'?'on':''}" onclick="setStatus('${c.id}','O')">O</button>
-    <button class="mini x ${c.status==='X'?'on':''}" onclick="setStatus('${c.id}','X')">X</button>
-    <button class="btn" style="padding:5px 7px;font-size:10px" onclick="setStatus('${c.id}','대기')">대기</button>
-   </div>
-  </td>
- </tr>`).join('');
- updateCounts();
+/* =====================================================================
+   DASHBOARD
+   ===================================================================== */
+function renderDashboard(){
+  document.getElementById('kpiTotal').textContent = companies.length;
+  document.getElementById('okCount').textContent = companies.filter(c=>c.status==='O').length;
+  document.getElementById('waitCount').textContent = companies.filter(c=>c.status==='대기').length;
+  document.getElementById('xCount').textContent = companies.filter(c=>c.status==='X').length;
+  document.getElementById('staffCount').textContent = staff.length;
+
+  const rows = companies.filter(c=>c.assignment)
+    .sort((a,b)=> (a.assignment.date+a.assignment.time).localeCompare(b.assignment.date+b.assignment.time))
+    .map(c=>{
+      const s = findStaff(c.assignment.staffId);
+      const r = findRegion(c.regionId);
+      return `<tr>
+        <td>${fmtDateLabel(c.assignment.date)}</td>
+        <td>${c.assignment.time}</td>
+        <td>${s? s.name : '(삭제된 담당자)'}</td>
+        <td class="company">${c.name}</td>
+        <td>${r? r.name : c.regionId}</td>
+        <td>${c.attendees||0}명 / ${c.attendees||0}부</td>
+        <td>${statusBadge(c.status)}</td>
+      </tr>`;
+    }).join('');
+  document.getElementById('dashboardTable').innerHTML = rows || '<tr><td colspan="7" class="sub" style="padding:20px">확정된 배정이 없습니다.</td></tr>';
 }
 
-function statusBadge(s){
- if(s==='O') return '<span class="badge ok">O 배정/진행</span>';
- if(s==='X') return '<span class="badge no">X 진행 안 함</span>';
- return '<span class="badge wait">대기</span>';
+/* =====================================================================
+   PARTNERS PAGE
+   ===================================================================== */
+let partnerFilter = 'all';
+function renderPartnerFilterTabs(){
+  const counts = {
+    all: companies.length,
+    'O': companies.filter(c=>c.status==='O').length,
+    '대기': companies.filter(c=>c.status==='대기').length,
+    'X': companies.filter(c=>c.status==='X').length,
+  };
+  const tabs = [
+    {key:'all',label:'전체'},
+    {key:'O',label:'O 배정/진행'},
+    {key:'대기',label:'대기'},
+    {key:'X',label:'X 진행 안 함'},
+  ];
+  document.getElementById('partnerFilterTabs').innerHTML = tabs.map(t=>
+    `<button class="filter-tab ${partnerFilter===t.key?'active':''}" onclick="setPartnerFilter('${t.key}')">${t.label} · ${counts[t.key]}</button>`
+  ).join('');
+}
+function setPartnerFilter(key){ partnerFilter = key; renderPartners(); }
+
+function renderPartners(){
+  renderPartnerFilterTabs();
+  const q = (document.getElementById('partnerSearch').value||'').toLowerCase().trim();
+  let list = companies;
+  if(partnerFilter!=='all') list = list.filter(c=>c.status===partnerFilter);
+  if(q) list = list.filter(c=>
+    c.name.toLowerCase().includes(q) ||
+    (findRegion(c.regionId)||{name:''}).name.toLowerCase().includes(q) ||
+    c.corpId.toLowerCase().includes(q)
+  );
+
+  const tb = document.querySelector('#partnerTable tbody');
+  tb.innerHTML = list.map(c=>{
+    const r = findRegion(c.regionId);
+    const assignLabel = c.assignment ? `${fmtDateLabel(c.assignment.date)} ${c.assignment.time} · ${(findStaff(c.assignment.staffId)||{}).name||'-'}` : '-';
+    const reqLabel = c.requests && c.requests.length ? c.requests.length+'개 접수' : '-';
+    const statusExtra = c.status==='X' && c.xReason ? `<div class="sub">사유: ${c.xReason}</div>` : '';
+    return `<tr>
+      <td><div class="company">${c.name}</div><div class="sub">${c.address}</div></td>
+      <td>${c.corpId}</td>
+      <td>${r? r.name : c.regionId}</td>
+      <td>${reqLabel}</td>
+      <td>${assignLabel}</td>
+      <td>${statusBadge(c.status)}${statusExtra}</td>
+      <td>
+       <div class="status-buttons">
+        <button class="mini o ${c.status==='O'?'on':''}" onclick="setStatus('${c.corpId}','O')">O</button>
+        <button class="mini x ${c.status==='X'?'on':''}" onclick="setStatus('${c.corpId}','X')">X</button>
+        <button class="mini w ${c.status==='대기'?'on':''}" onclick="setStatus('${c.corpId}','대기')">대기</button>
+       </div>
+      </td>
+     </tr>`;
+  }).join('') || `<tr><td colspan="7" class="sub" style="padding:20px">검색 결과가 없습니다.</td></tr>`;
 }
 
-function setStatus(id,s){
- const c=companies.find(x=>x.id===id);
- c.status=s;
- if(s==='X'){c.assign='-';c.choices=0;}
- renderPartners();
+let xReasonTarget = null;
+function setStatus(corpId, status){
+  if(status==='X'){ openXReasonModal(corpId); return; }
+  const c = findCompany(corpId);
+  c.status = status;
+  c.xReason = null;
+  if(status==='대기'){ c.assignment = null; }
+  saveState();
+  renderPartners();
+  renderDashboard();
+}
+function openXReasonModal(corpId){
+  xReasonTarget = corpId;
+  document.getElementById('xReasonSelect').value='일정 불가';
+  document.getElementById('xReasonModal').classList.add('show');
+}
+function closeXReasonModal(){
+  document.getElementById('xReasonModal').classList.remove('show');
+  xReasonTarget = null;
+}
+function confirmXReason(){
+  if(!xReasonTarget) return;
+  const c = findCompany(xReasonTarget);
+  c.status='X';
+  c.xReason=document.getElementById('xReasonSelect').value;
+  c.assignment=null;
+  if(draftPlan) draftPlan.assignments = draftPlan.assignments.filter(a=>a.corpId!==c.corpId);
+  saveState();
+  closeXReasonModal();
+  renderPartners();
+  renderDashboard();
+  if(document.getElementById('schedule').classList.contains('active')) renderSchedulePage();
 }
 
-function filterPartners(){
- const q=document.getElementById('partnerSearch').value.toLowerCase();
- renderPartners(companies.filter(c=>
-  c.name.toLowerCase().includes(q)||
-  c.region.toLowerCase().includes(q)||
-  c.id.toLowerCase().includes(q)
- ));
+/* =====================================================================
+   REGIONS ADMIN PAGE
+   ===================================================================== */
+function renderRegions(){
+  document.getElementById('regionTable').innerHTML = regions.map(r=>{
+    const count = companies.filter(c=>c.regionId===r.id).length;
+    return `<tr class="region-row">
+      <td class="company">${r.name}</td>
+      <td><input type="date" id="rs-${r.id}" value="${r.start}"></td>
+      <td><input type="date" id="re-${r.id}" value="${r.end}"></td>
+      <td>${count}개</td>
+      <td><button class="btn" onclick="saveRegion('${r.id}')">저장</button></td>
+    </tr>`;
+  }).join('');
+}
+function saveRegion(regionId){
+  const r = findRegion(regionId);
+  const start = document.getElementById('rs-'+regionId).value;
+  const end = document.getElementById('re-'+regionId).value;
+  if(!start || !end || start>end){ alert('시작일이 종료일보다 늦을 수 없습니다.'); return; }
+  r.start = start; r.end = end;
+  saveState();
+  renderRegions();
+  alert(r.name+' 운영기간이 '+fmtDateFull(start)+' ~ '+fmtDateFull(end)+'(으)로 저장되었습니다.');
 }
 
-function updateCounts(){
- document.getElementById('okCount').textContent=companies.filter(c=>c.status==='O').length;
- document.getElementById('xCount').textContent=companies.filter(c=>c.status==='X').length;
- document.getElementById('waitCount').textContent=companies.filter(c=>c.status==='대기').length;
-}
+/* =====================================================================
+   REQUEST PAGE (업체 일정 접수)
+   ===================================================================== */
+let selectedCompany = null;
 
 function searchCompanies(){
- const q=document.getElementById('companySearch').value.toLowerCase().trim();
- const box=document.getElementById('companyResults');
- if(!q){box.innerHTML='';return;}
- const found=companies.filter(c=>
-   c.name.toLowerCase().includes(q)||
-   c.id.toLowerCase().includes(q)||
-   c.region.toLowerCase().includes(q)
+ const q = document.getElementById('companySearch').value.toLowerCase().trim();
+ const box = document.getElementById('companyResults');
+ if(!q){ box.innerHTML=''; return; }
+ const found = companies.filter(c=>
+   c.name.toLowerCase().includes(q) ||
+   c.corpId.toLowerCase().includes(q) ||
+   (findRegion(c.regionId)||{name:''}).name.toLowerCase().includes(q)
  );
- box.innerHTML=found.map(c=>`
-   <div class="company-result" onclick="selectCompany('${c.id}')">
-     <div class="company">${c.name}</div>
-     <div class="sub">${c.id} · ${c.region} · ${c.address}</div>
-   </div>`).join('') || '<div class="sub" style="padding:15px">검색 결과가 없습니다.</div>';
+ box.innerHTML = found.map(c=>{
+   const r = findRegion(c.regionId);
+   return `<div class="company-result ${selectedCompany&&selectedCompany.corpId===c.corpId?'selected':''}" onclick="selectCompany('${c.corpId}')">
+     <div class="company">${c.name} ${c.status==='X'?'<span class="badge no" style="margin-left:6px">X</span>':''}</div>
+     <div class="sub">${c.corpId} · ${r?r.name:c.regionId} · ${c.address}</div>
+   </div>`;
+ }).join('') || '<div class="sub" style="padding:15px">검색 결과가 없습니다.</div>';
 }
 
-function selectCompany(id){
- selectedCompany=companies.find(c=>c.id===id);
+function selectCompany(corpId){
+ selectedCompany = findCompany(corpId);
+ const r = findRegion(selectedCompany.regionId);
  document.getElementById('requestForm').style.display='block';
- document.getElementById('selectedCompanyName').textContent=selectedCompany.name+' · '+selectedCompany.region;
- document.getElementById('selectedCompanyId').textContent=selectedCompany.id;
- document.getElementById('availableRange').textContent=selectedCompany.range;
+ document.getElementById('selectedCompanyName').textContent = selectedCompany.name+' · '+(r?r.name:selectedCompany.regionId);
+ document.getElementById('selectedCompanyId').textContent = selectedCompany.corpId;
+ document.getElementById('availableRange').textContent = r ? (fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end)) : '지역 정보 없음';
+ document.getElementById('selectedCompanyMeta').textContent = selectedCompany.address+' · '+selectedCompany.contact;
+
+ [1,2,3].forEach(i=>{
+   const dInput = document.getElementById('d'+i);
+   const tSelect = document.getElementById('t'+i);
+   if(r){ dInput.min = r.start; dInput.max = r.end; }
+   tSelect.innerHTML = TIME_SLOTS.map(t=>`<option value="${t}">${t}</option>`).join('');
+   const existing = (selectedCompany.requests||[]).find(x=>x.priority===i);
+   dInput.value = existing? existing.date : (r? r.start : '');
+   tSelect.value = existing? existing.time : TIME_SLOTS[0];
+ });
+
+ document.getElementById('people').value = selectedCompany.attendees || 5;
+ syncMaterial();
+ searchCompanies();
 }
 
 function syncMaterial(){
- const n=document.getElementById('people').value||0;
- document.getElementById('materials').value=n+'부';
+ const n = document.getElementById('people').value || 0;
+ document.getElementById('materials').value = n+'부';
 }
 
 function saveRequest(){
- if(!selectedCompany)return;
- selectedCompany.choices=3;
- selectedCompany.status='대기';
- alert(selectedCompany.name+'의 희망일정 3개가 저장되었습니다.\\n참석 인원과 동일하게 자료 부수가 자동 적용됩니다.');
+ if(!selectedCompany) return;
+ const r = findRegion(selectedCompany.regionId);
+ const picks = [1,2,3].map(i=>({
+   priority:i,
+   date: document.getElementById('d'+i).value,
+   time: document.getElementById('t'+i).value,
+ }));
+
+ for(const p of picks){
+   if(!p.date){ alert(p.priority+'순위 날짜를 선택해 주세요.'); return; }
+   if(r && (p.date < r.start || p.date > r.end)){
+     alert(p.priority+'순위 날짜가 '+(r.name)+' 지역 운영기간('+fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end)+') 범위를 벗어났습니다.');
+     return;
+   }
+ }
+ const keySet = new Set(picks.map(p=>p.date+' '+p.time));
+ if(keySet.size < picks.length){ alert('1·2·3순위는 서로 다른 날짜/시간이어야 합니다.'); return; }
+
+ const attendees = parseInt(document.getElementById('people').value,10) || 0;
+ if(attendees<=0){ alert('참석 인원을 1명 이상 입력해 주세요.'); return; }
+
+ selectedCompany.requests = picks;
+ selectedCompany.attendees = attendees;
+ if(selectedCompany.status!=='O') selectedCompany.status='대기';
+ selectedCompany.xReason = null;
+ saveState();
+ alert(selectedCompany.name+'의 희망일정 3개가 저장되었습니다.\n참석인원 '+attendees+'명 기준으로 준비자료 '+attendees+'부가 자동 계산됩니다.');
  renderPartners();
+ renderDashboard();
 }
 
 function markSelectedX(){
- if(!selectedCompany)return;
- selectedCompany.status='X';
- selectedCompany.choices=0;
- selectedCompany.assign='-';
- alert(selectedCompany.name+'을(를) X 처리했습니다. 자동배정 대상에서 제외됩니다.');
- renderPartners();
+ if(!selectedCompany) return;
+ openXReasonModal(selectedCompany.corpId);
 }
 
-function renderSchedule(){
- const viewer=document.getElementById('viewer').value;
- const title=document.getElementById('scheduleTitle');
- title.textContent=viewer==='all'?'전체 배정 일정':viewer+' · 내 일정';
- const filtered=viewer==='all'?events:events.filter(e=>e.staff===viewer);
- const dates=['12/01','12/02','12/03','12/04','12/05'];
- const grid=document.getElementById('scheduleGrid');
- grid.innerHTML=dates.map(d=>{
-   const es=filtered.filter(e=>e.date===d);
-   return `<div class="day">
-    <div class="day-head">${d}</div>
-    ${es.length?es.map(e=>`
-      <div class="event" onclick='openEvent(${JSON.stringify(e)})'>
-       <div class="event-time">${e.time} · ${e.staff}</div>
-       <div class="event-name">${e.company}</div>
-       <div class="event-meta">${e.region}<br>참석 ${e.people}명 · 자료 ${e.people}부</div>
-      </div>`).join(''):'<div class="sub" style="padding:14px">배정 없음</div>'}
-   </div>`;
- }).join('');
+/* =====================================================================
+   SCHEDULE PAGE
+   ===================================================================== */
+function computeDateColumns(){
+  const starts = regions.map(r=>r.start), ends = regions.map(r=>r.end);
+  const min = starts.sort()[0], max = ends.sort().slice(-1)[0];
+  const dates = [];
+  let cur = new Date(min+'T00:00:00');
+  const last = new Date(max+'T00:00:00');
+  while(cur<=last){
+    dates.push(cur.toISOString().slice(0,10));
+    cur.setDate(cur.getDate()+1);
+  }
+  return dates;
 }
 
-function openEvent(e){
- document.getElementById('modalName').textContent=e.company;
- document.getElementById('modalDate').textContent=e.date+' '+e.time+' · '+e.staff;
- document.getElementById('modalPeople').textContent=e.people+'명';
- document.getElementById('modalMaterial').textContent=e.people+'부';
- document.getElementById('modalAddress').innerHTML='<strong>주소</strong><div class="sub">'+e.address+'</div>';
- document.getElementById('substituteArea').innerHTML='';
- document.getElementById('detailModal').classList.add('show');
+function refreshViewerSelect(){
+  const sel = document.getElementById('viewer');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="all">전체 담당자</option>' +
+    staff.map(s=>`<option value="${s.staffId}">${s.name}${s.active?'':' (비활성)'}</option>`).join('');
+  sel.value = staff.some(s=>s.staffId===prev) ? prev : 'all';
+}
+
+function renderSchedulePage(){
+  refreshViewerSelect();
+  const viewerId = document.getElementById('viewer').value;
+  const title = document.getElementById('scheduleTitle');
+  title.textContent = viewerId==='all' ? '전체 배정 일정' : (findStaff(viewerId)||{}).name+' · 내 일정';
+
+  renderDraftPanel();
+
+  const dates = computeDateColumns();
+  const grid = document.getElementById('scheduleGrid');
+  grid.innerHTML = dates.map(d=>{
+    let confirmed = companies.filter(c=>c.assignment && c.assignment.date===d);
+    let draft = draftPlan ? draftPlan.assignments.filter(a=>a.date===d) : [];
+    if(viewerId!=='all'){
+      confirmed = confirmed.filter(c=>c.assignment.staffId===viewerId);
+      draft = draft.filter(a=>a.staffId===viewerId);
+    }
+    confirmed = confirmed.slice().sort((a,b)=>a.assignment.time.localeCompare(b.assignment.time));
+    const confirmedHtml = confirmed.map(c=>{
+      const s = findStaff(c.assignment.staffId);
+      return `<div class="event" onclick="openEventByKey('${c.corpId}')">
+        <div class="event-time"><span>${c.assignment.time} · ${s?s.name:'-'}</span></div>
+        <div class="event-name">${c.name}</div>
+        <div class="event-meta">${(findRegion(c.regionId)||{}).name||c.regionId}<br>참석 ${c.attendees}명 · 자료 ${c.attendees}부</div>
+      </div>`;
+    }).join('');
+    const draftHtml = draft.map(a=>{
+      const c = findCompany(a.corpId);
+      const s = findStaff(a.staffId);
+      return `<div class="event draft" onclick="openDraftByKey('${a.corpId}')">
+        <div class="event-time"><span>${a.time} · ${s?s.name:'-'}</span><span class="tag-demo">초안</span></div>
+        <div class="event-name">${c.name}</div>
+        <div class="event-meta">${(findRegion(c.regionId)||{}).name||c.regionId}<br>참석 ${c.attendees}명 · 자료 ${c.attendees}부 · ${a.priorityUsed}순위</div>
+      </div>`;
+    }).join('');
+    const body = confirmedHtml+draftHtml;
+    return `<div class="day">
+      <div class="day-head">${fmtDateLabel(d)}<span>${(findRegion2ByDate(d))}</span></div>
+      ${body || '<div class="sub" style="padding:14px">배정 없음</div>'}
+    </div>`;
+  }).join('');
+}
+
+function findRegion2ByDate(d){
+  const rs = regions.filter(r=>d>=r.start && d<=r.end).map(r=>r.name);
+  return rs.join('/');
+}
+
+function renderDraftPanel(){
+  const box = document.getElementById('draftPanel');
+  if(!draftPlan || (draftPlan.assignments.length===0 && draftPlan.unassigned.length===0)){
+    box.innerHTML='';
+    return;
+  }
+  const rows = draftPlan.assignments.map(a=>{
+    const c = findCompany(a.corpId);
+    const s = findStaff(a.staffId);
+    return `<div class="draft-row">
+      <div><b>${c.name}</b> <span class="sub">${(findRegion(c.regionId)||{}).name||''}</span></div>
+      <div>${fmtDateLabel(a.date)} ${a.time} · ${s?s.name:'-'} <span class="pill">${a.priorityUsed}순위</span></div>
+      <button class="btn primary" onclick="confirmDraftRow('${a.corpId}')">배정 확정</button>
+    </div>`;
+  }).join('');
+  const unassignedRows = draftPlan.unassigned.map(u=>{
+    const c = findCompany(u.corpId);
+    return `<div class="draft-row"><div><b>${c.name}</b></div><div class="sub">${u.reason}</div><span class="pill">미배정</span></div>`;
+  }).join('');
+
+  box.innerHTML = `<div class="panel">
+    <div class="panel-head">
+      <strong>자동배정안 (확정 전) <span class="tag-demo">DEMO 이동시간 기반</span></strong>
+      <div class="btn-row">
+        <button class="btn primary" onclick="confirmAllDraft()" ${draftPlan.assignments.length===0?'disabled':''}>전체 확정</button>
+        <button class="btn" onclick="discardDraft()">초안 취소</button>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:0">
+      ${rows || '<div class="sub" style="padding:16px">이번 초안에서 새로 배정된 건이 없습니다.</div>'}
+      ${unassignedRows}
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   AUTO-ASSIGNMENT ENGINE
+   조건: 1~3순위, 담당자 가용성, 하루 최대건수, 같은 지역 묶기,
+   이동시간(DEMO), 업무량 균형, 기존 배정과의 충돌, 다음 일정 도착가능여부.
+   실제 거리/이동시간 API가 생기면 demoTravelMinutes()만 교체하면 된다.
+   ===================================================================== */
+function generateDraftPlan(){
+  const eligible = companies.filter(c=>c.status!=='X' && !c.assignment && Array.isArray(c.requests) && c.requests.length>0);
+  const workingAssignments = [];
+  const assignedIds = new Set();
+
+  function staffBusyAt(staffId,date,time){
+    const confirmedBusy = companies.some(c=>c.assignment && c.assignment.staffId===staffId && c.assignment.date===date && c.assignment.time===time);
+    const draftBusy = workingAssignments.some(a=>a.staffId===staffId && a.date===date && a.time===time);
+    return confirmedBusy || draftBusy;
+  }
+  function staffDayEventsCombined(staffId,date){
+    const confirmed = companies.filter(c=>c.assignment && c.assignment.staffId===staffId && c.assignment.date===date)
+      .map(c=>({corpId:c.corpId,time:c.assignment.time,regionId:c.regionId}));
+    const draft = workingAssignments.filter(a=>a.staffId===staffId && a.date===date)
+      .map(a=>({corpId:a.corpId,time:a.time,regionId:findCompany(a.corpId).regionId}));
+    return confirmed.concat(draft).sort((a,b)=>a.time.localeCompare(b.time));
+  }
+  function feasibleTravel(staffId,date,time,corpId){
+    const dayEvents = staffDayEventsCombined(staffId,date);
+    const startM = timeToMinutes(time), endM = startM+SEMINAR_DURATION_MIN;
+    let prev=null, next=null;
+    dayEvents.forEach(e=>{
+      const eStart=timeToMinutes(e.time), eEnd=eStart+SEMINAR_DURATION_MIN;
+      if(eEnd<=startM && (!prev || eEnd>timeToMinutes(prev.time)+SEMINAR_DURATION_MIN)) prev=e;
+      if(eStart>=endM && (!next || eStart<timeToMinutes(next.time))) next=e;
+    });
+    if(prev){
+      const t = demoTravelMinutes(prev.corpId, corpId);
+      if(timeToMinutes(prev.time)+SEMINAR_DURATION_MIN+t > startM) return false;
+    }
+    if(next){
+      const t = demoTravelMinutes(corpId, next.corpId);
+      if(endM+t > timeToMinutes(next.time)) return false;
+    }
+    return true;
+  }
+  function regionClusterBonus(staffId,date,regionId){
+    return staffDayEventsCombined(staffId,date).filter(e=>e.regionId===regionId).length;
+  }
+  function totalWorkload(staffId){
+    return companies.filter(c=>c.assignment && c.assignment.staffId===staffId).length
+      + workingAssignments.filter(a=>a.staffId===staffId).length;
+  }
+
+  for(let round=1; round<=3; round++){
+    const candidates = eligible.filter(c=>!assignedIds.has(c.corpId))
+      .map(c=>({company:c, req:c.requests.find(r=>r.priority===round)}))
+      .filter(x=>x.req);
+    candidates.sort((a,b)=> a.company.regionId.localeCompare(b.company.regionId) || a.company.corpId.localeCompare(b.company.corpId));
+
+    candidates.forEach(({company,req})=>{
+      if(assignedIds.has(company.corpId)) return;
+      const region = findRegion(company.regionId);
+      if(region && (req.date < region.start || req.date > region.end)) return;
+
+      const activeStaff = staff.filter(s=>s.active);
+      let best=null, bestScore=-Infinity;
+      activeStaff.forEach(s=>{
+        if(staffBusyAt(s.staffId, req.date, req.time)) return;
+        const dayCount = staffDayEventsCombined(s.staffId, req.date).length;
+        if(dayCount >= s.maxPerDay) return;
+        if(!feasibleTravel(s.staffId, req.date, req.time, company.corpId)) return;
+        const cluster = regionClusterBonus(s.staffId, req.date, company.regionId);
+        const workload = totalWorkload(s.staffId);
+        const score = (4-round)*10 + cluster*5 - workload*2;
+        if(score>bestScore){ bestScore=score; best=s; }
+      });
+      if(best){
+        workingAssignments.push({corpId:company.corpId, date:req.date, time:req.time, staffId:best.staffId, priorityUsed:round});
+        assignedIds.add(company.corpId);
+      }
+    });
+  }
+
+  const unassigned = eligible.filter(c=>!assignedIds.has(c.corpId))
+    .map(c=>({corpId:c.corpId, reason:'희망일정 1~3순위 모두 배정 가능한 담당자를 찾지 못했습니다 (시간 충돌·정원 초과·이동시간 부족).'}));
+
+  draftPlan = {createdAt:new Date().toISOString(), assignments:workingAssignments, unassigned};
+  saveState();
+  goPage('schedule');
+}
+
+function confirmDraftRow(corpId){
+  if(!draftPlan) return;
+  const idx = draftPlan.assignments.findIndex(a=>a.corpId===corpId);
+  if(idx===-1) return;
+  const a = draftPlan.assignments[idx];
+  const c = findCompany(corpId);
+  c.assignment = {date:a.date, time:a.time, staffId:a.staffId};
+  c.status='O';
+  draftPlan.assignments.splice(idx,1);
+  saveState();
+  renderSchedulePage();
+  renderPartners();
+  renderDashboard();
+}
+function confirmAllDraft(){
+  if(!draftPlan) return;
+  draftPlan.assignments.slice().forEach(a=>confirmDraftRow(a.corpId));
+}
+function discardDraft(){
+  draftPlan=null;
+  saveState();
+  renderSchedulePage();
+}
+
+/* =====================================================================
+   EVENT DETAIL MODAL
+   ===================================================================== */
+function openEventByKey(corpId){
+  const c = findCompany(corpId);
+  if(!c || !c.assignment) return;
+  modalShowView(corpId);
+  document.getElementById('detailModal').classList.add('show');
+}
+function openDraftByKey(corpId){
+  const c = findCompany(corpId);
+  const a = draftPlan.assignments.find(x=>x.corpId===corpId);
+  if(!c || !a) return;
+  const s = findStaff(a.staffId);
+  document.getElementById('modalName').textContent = c.name+' (초안)';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="sub">${fmtDateLabel(a.date)} ${a.time} · ${s?s.name:'-'} · ${a.priorityUsed}순위 <span class="tag-demo">확정 전</span></div>
+    <div class="big-info">
+      <div class="big-card"><span>참석 인원</span><strong>${c.attendees}명</strong></div>
+      <div class="big-card"><span>준비 자료</span><strong>${c.attendees}부</strong></div>
+    </div>
+    <div class="info-box"><strong>주소</strong><div class="sub">${c.address}</div><strong style="display:block;margin-top:8px">연락처</strong><div class="sub">${c.contact}</div></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn primary" onclick="confirmDraftRow('${c.corpId}');closeModal()">이 배정 확정</button>
+    </div>`;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function modalShowView(corpId){
+  const c = findCompany(corpId);
+  const s = findStaff(c.assignment.staffId);
+  document.getElementById('modalName').textContent = c.name;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="sub">${fmtDateLabel(c.assignment.date)} ${c.assignment.time} · ${s?s.name:'(삭제된 담당자)'}</div>
+    <div class="big-info">
+      <div class="big-card"><span>참석 인원</span><strong>${c.attendees}명</strong></div>
+      <div class="big-card"><span>준비 자료</span><strong>${c.attendees}부</strong></div>
+    </div>
+    <div class="info-box">
+      <strong>주소</strong><div class="sub">${c.address}</div>
+      <strong style="display:block;margin-top:8px">연락처</strong><div class="sub">${c.contact}</div>
+    </div>
+    <div class="btn-row" style="justify-content:flex-end;display:flex">
+      <button class="btn" onclick="modalShowSubstitute('${corpId}')">대타 찾기</button>
+      <button class="btn" onclick="modalShowChangeStaff('${corpId}')">담당자 변경</button>
+      <button class="btn primary" onclick="modalShowEditSchedule('${corpId}')">일정 수정</button>
+    </div>`;
+}
+
+function modalShowEditSchedule(corpId){
+  const c = findCompany(corpId);
+  const r = findRegion(c.regionId);
+  document.getElementById('modalBody').innerHTML = `
+    <div class="sub">희망 등록 범위: ${r? fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end) : '-'}</div>
+    <div class="edit-grid">
+      <div class="field"><label>날짜</label><input type="date" id="editDate" value="${c.assignment.date}" ${r?`min="${r.start}" max="${r.end}"`:''}></div>
+      <div class="field"><label>시간</label><select id="editTime">${TIME_SLOTS.map(t=>`<option ${t===c.assignment.time?'selected':''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="modalShowView('${corpId}')">취소</button>
+      <button class="btn primary" onclick="modalSaveSchedule('${corpId}')">저장</button>
+    </div>`;
+}
+function modalSaveSchedule(corpId){
+  const c = findCompany(corpId);
+  const date = document.getElementById('editDate').value;
+  const time = document.getElementById('editTime').value;
+  const r = findRegion(c.regionId);
+  if(r && (date<r.start || date>r.end)){ alert('해당 지역 운영기간을 벗어났습니다.'); return; }
+  const conflict = companies.some(o=>o.corpId!==corpId && o.assignment && o.assignment.staffId===c.assignment.staffId && o.assignment.date===date && o.assignment.time===time);
+  if(conflict && !confirm('같은 담당자의 다른 일정과 시간이 겹칩니다. 그래도 저장할까요?')) return;
+  c.assignment.date=date; c.assignment.time=time;
+  saveState();
+  modalShowView(corpId);
+  renderSchedulePage();
+  renderPartners();
+  renderDashboard();
+}
+
+function modalShowChangeStaff(corpId){
+  const c = findCompany(corpId);
+  document.getElementById('modalBody').innerHTML = `
+    <div class="field">
+      <label>담당자 선택</label>
+      <select id="editStaff">${staff.map(s=>`<option value="${s.staffId}" ${s.staffId===c.assignment.staffId?'selected':''}>${s.name}${s.active?'':' (비활성)'}</option>`).join('')}</select>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="modalShowView('${corpId}')">취소</button>
+      <button class="btn primary" onclick="modalSaveStaff('${corpId}')">변경 저장</button>
+    </div>`;
+}
+function modalSaveStaff(corpId){
+  const c = findCompany(corpId);
+  const newStaffId = document.getElementById('editStaff').value;
+  const dayCount = getStaffDayEvents(newStaffId, c.assignment.date, false).filter(e=>e.corpId!==corpId).length;
+  const s = findStaff(newStaffId);
+  if(s && dayCount >= s.maxPerDay && !confirm(s.name+'님은 이미 해당 날짜 최대 건수('+s.maxPerDay+'건)입니다. 그래도 변경할까요?')) return;
+  c.assignment.staffId = newStaffId;
+  saveState();
+  modalShowView(corpId);
+  renderSchedulePage();
+  renderPartners();
+  renderDashboard();
+}
+
+/* =====================================================================
+   대타 찾기
+   ===================================================================== */
+function modalShowSubstitute(corpId){
+  const c = findCompany(corpId);
+  const candidates = computeSubstituteCandidates(corpId);
+  const rows = candidates.map(r=>{
+    const parts = [];
+    if(r.prev){
+      const prevName = (findCompany(r.prev.corpId)||{}).name || r.prev.corpId;
+      parts.push('직전 일정('+prevName+' '+r.prev.time+') → 대타 업체 약 '+minutesToLabel(r.travelToTarget));
+    } else {
+      parts.push('본사(HQ) → 대타 업체 약 '+minutesToLabel(r.travelToTarget)+' (DEMO)');
+    }
+    if(r.next){
+      parts.push('세미나 종료 후 다음 업체('+(findCompany(r.next.corpId)||{}).name+')까지 약 '+minutesToLabel(r.travelToNext));
+      parts.push(r.nextOk ? '다음 일정 도착 가능' : '다음 일정 시간 부족');
+    } else {
+      parts.push('대타 이후 일정 없음');
+    }
+    parts.push('오늘 '+r.totalToday+'건'+(r.overCapacity?' · 하루 최대 초과':''));
+    const verdict = r.feasible ? '배정 가능' : '배정 불가';
+    return `<div class="candidate ${r.feasible?'':'infeasible'}">
+      <strong>${r.staff.name} · ${verdict}</strong>
+      <p>${parts.join(' · ')}</p>
+      ${r.feasible?`<button class="btn blue" onclick="assignSubstitute('${corpId}','${r.staff.staffId}')">대타 배정</button>`:''}
+    </div>`;
+  }).join('') || '<div class="sub" style="padding:10px">활성 담당자가 없습니다.</div>';
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="sub">${c.name} · ${fmtDateLabel(c.assignment.date)} ${c.assignment.time} 대타 후보 <span class="tag-demo">DEMO 이동시간 · 지도 API 연동 전</span></div>
+    <div style="margin-top:10px">${rows}</div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px">
+      <button class="btn" onclick="modalShowView('${corpId}')">뒤로</button>
+    </div>`;
+}
+
+function computeSubstituteCandidates(corpId){
+  const c = findCompany(corpId);
+  const {date, time, staffId:currentStaffId} = c.assignment;
+  const startM = timeToMinutes(time), endM = startM+SEMINAR_DURATION_MIN;
+
+  return staff.filter(s=>s.active && s.staffId!==currentStaffId).map(s=>{
+    const dayEvents = getStaffDayEvents(s.staffId, date, false).filter(e=>e.corpId!==corpId);
+    let prev=null, next=null;
+    dayEvents.forEach(e=>{
+      const eStart=timeToMinutes(e.time), eEnd=eStart+SEMINAR_DURATION_MIN;
+      if(eEnd<=startM && (!prev || eEnd>timeToMinutes(prev.time)+SEMINAR_DURATION_MIN)) prev=e;
+      if(eStart>=endM && (!next || eStart<timeToMinutes(next.time))) next=e;
+    });
+    const fromLoc = prev ? prev.corpId : 'HQ';
+    const travelToTarget = demoTravelMinutes(fromLoc, corpId);
+    const arrivalPossible = prev ? (timeToMinutes(prev.time)+SEMINAR_DURATION_MIN+travelToTarget <= startM) : true;
+    let nextOk=true, travelToNext=null;
+    if(next){
+      travelToNext = demoTravelMinutes(corpId, next.corpId);
+      nextOk = endM+travelToNext <= timeToMinutes(next.time);
+    }
+    const totalToday = dayEvents.length+1;
+    const overCapacity = totalToday > s.maxPerDay;
+    const feasible = arrivalPossible && nextOk && !overCapacity;
+    return {staff:s, prev, next, travelToTarget, travelToNext, arrivalPossible, nextOk, totalToday, overCapacity, feasible};
+  }).sort((a,b)=> (b.feasible-a.feasible) || (a.travelToTarget-b.travelToTarget));
+}
+
+function assignSubstitute(corpId, staffId){
+  const c = findCompany(corpId);
+  c.assignment.staffId = staffId;
+  saveState();
+  closeModal();
+  renderSchedulePage();
+  renderPartners();
+  renderDashboard();
 }
 
 function closeModal(){
- document.getElementById('detailModal').classList.remove('show');
+  document.getElementById('detailModal').classList.remove('show');
 }
-
-function findSubstitute(){
- document.getElementById('substituteArea').innerHTML=`
- <div style="font-weight:700;margin-top:20px">대타 가능 후보</div>
- <div class="candidate">
-   <strong>담당자 04 · 배정 가능</strong>
-   <p>직전 일정 → 해당 업체 약 28분 · 이후 일정 없음 · 오늘 1건</p>
-   <button class="btn blue" onclick="alert('담당자 04로 대타 배정되었습니다. (시안)')">대타 배정</button>
- </div>
- <div class="candidate">
-   <strong>담당자 07 · 배정 가능</strong>
-   <p>현재 위치 → 해당 업체 약 36분 · 다음 일정까지 약 41분 · 도착 가능</p>
-   <button class="btn" onclick="alert('담당자 07로 대타 배정되었습니다. (시안)')">대타 배정</button>
- </div>
- <div class="candidate" style="opacity:.6">
-   <strong>담당자 02 · 배정 불가</strong>
-   <p>직전 일정에서 이동 시 약 1시간 12분 · 시간 부족</p>
- </div>`;
-}
-
-function autoAssign(){
- const targets=companies.filter(c=>c.status!=='X'&&c.choices>0);
- alert(
-  '자동배정 시뮬레이션\\n\\n'+
-  '대상 업체: '+targets.length+'개\\n'+
-  '담당자: '+staff.length+'명\\n\\n'+
-  '실제 연결 시 아래 조건을 동시에 계산합니다.\\n'+
-  '• 업체 희망일정 1·2·3순위\\n'+
-  '• 담당자 하루 최대 2건\\n'+
-  '• 기존 담당자 일정\\n'+
-  '• 업체 간 차량 이동시간\\n'+
-  '• 다음 일정 도착 가능 여부\\n'+
-  '• X 업체 자동 제외'
- );
-}
-
-function renderStaff(){
- const grid=document.getElementById('staffGrid');
- grid.innerHTML=staff.map((s,i)=>`
- <div class="staff">
-   <div>
-    <div class="sub">담당자 ${String(i+1).padStart(2,'0')}</div>
-    <input value="${s}" onchange="renameStaff(${i},this.value)">
-   </div>
-   <div style="text-align:right">
-    <div class="switch">사용 중</div>
-    <div class="sub">1일 최대 2건</div>
-   </div>
- </div>`).join('');
-}
-
-function renameStaff(i,name){
- const old=staff[i];
- staff[i]=name||old;
- [...document.getElementById('viewer').options].forEach(o=>{
-   if(o.value===old){o.value=staff[i];o.textContent=staff[i];}
- });
- events.forEach(e=>{if(e.staff===old)e.staff=staff[i];});
-}
-
-function addStaff(){
- staff.push('담당자 '+String(staff.length+1).padStart(2,'0'));
- renderStaff();
-}
-
-function renderRoute(){}
-
 document.getElementById('detailModal').addEventListener('click',e=>{
- if(e.target.id==='detailModal')closeModal();
+ if(e.target.id==='detailModal') closeModal();
+});
+document.getElementById('xReasonModal').addEventListener('click',e=>{
+ if(e.target.id==='xReasonModal') closeXReasonModal();
 });
 
-renderPartners();
-renderSchedule();
-renderStaff();
+/* =====================================================================
+   ROUTE PAGE (동선 지도, DEMO)
+   ===================================================================== */
+function getStaffAssignedDates(staffId){
+  const dates = new Set(companies.filter(c=>c.assignment && c.assignment.staffId===staffId).map(c=>c.assignment.date));
+  return [...dates].sort();
+}
+function refreshRouteStaffSelect(){
+  const sel = document.getElementById('routeStaff');
+  const prev = sel.value;
+  sel.innerHTML = staff.map(s=>`<option value="${s.staffId}">${s.name}</option>`).join('');
+  sel.value = staff.some(s=>s.staffId===prev) ? prev : (staff[0]?staff[0].staffId:'');
+}
+function renderRoute(){
+  refreshRouteStaffSelect();
+  const staffId = document.getElementById('routeStaff').value;
+  const dateSel = document.getElementById('routeDate');
+  if(dateSel.dataset.staff!==staffId){
+    const dates = getStaffAssignedDates(staffId);
+    dateSel.innerHTML = dates.length ? dates.map(d=>`<option value="${d}">${fmtDateLabel(d)}</option>`).join('') : '<option value="">배정 일정 없음</option>';
+    dateSel.dataset.staff = staffId;
+  }
+  const date = dateSel.value;
+  const s = findStaff(staffId);
+  document.getElementById('routeTitle').textContent = (s?s.name:'-')+(date?' · '+fmtDateLabel(date):'');
+
+  const events = date ? getStaffDayEvents(staffId, date, false).map(e=>({...e, company:findCompany(e.corpId)})) : [];
+
+  const map = document.getElementById('routeMap');
+  const listEl = document.getElementById('routeList');
+  if(!events.length){
+    map.innerHTML = '<div class="sub" style="padding:20px">표시할 배정 일정이 없습니다.</div>';
+    listEl.innerHTML = '<div class="route-item"><p>선택한 담당자/날짜에 확정된 일정이 없습니다.</p></div>';
+    return;
+  }
+
+  const stops = [{label:'본사', loc:'HQ'}, ...events.map(e=>({label:e.company.name, loc:e.corpId, time:e.time}))];
+  let pins='', roads='';
+  const positions = stops.map((_,i)=>({
+    x: 70 + (i%3)*230 + (Math.floor(i/3)%2)*40,
+    y: 70 + Math.floor(i/3)*150
+  }));
+  stops.forEach((st,i)=>{
+    pins += `<div class="pin" style="left:${positions[i].x}px;top:${positions[i].y}px" title="${st.label}">${i+1}</div>`;
+    if(i>0){
+      const dx = positions[i].x-positions[i-1].x, dy = positions[i].y-positions[i-1].y;
+      const len = Math.sqrt(dx*dx+dy*dy);
+      const angle = Math.atan2(dy,dx)*180/Math.PI;
+      roads += `<div class="road" style="width:${len}px;left:${positions[i-1].x+17}px;top:${positions[i-1].y+17}px;transform:rotate(${angle}deg)"></div>`;
+    }
+  });
+  map.innerHTML = roads+pins+'<div style="position:absolute;left:10px;bottom:10px" class="tag-demo">DEMO 이동시간 · 지도 API 연동 전</div>';
+
+  let items = `<div class="route-item"><strong>1. 출발 · 본사</strong><p>기존 일정 연동 전에는 본사를 기준 출발지로 사용합니다.</p></div>`;
+  let prevLoc='HQ', prevEndM=null;
+  events.forEach((e,i)=>{
+    const travel = demoTravelMinutes(prevLoc, e.corpId);
+    const startM = timeToMinutes(e.time);
+    const travelNote = prevEndM!==null ? `이전 업체에서 약 ${minutesToLabel(travel)} (DEMO)` : `본사에서 약 ${minutesToLabel(travel)} (DEMO)`;
+    items += `<div class="route-item">
+      <strong>${i+2}. ${e.company.name} · ${e.time}</strong>
+      <p>${(findRegion(e.company.regionId)||{}).name||''} · 참석 ${e.company.attendees}명 · 자료 ${e.company.attendees}부<br>${travelNote}</p>
+    </div>`;
+    prevLoc = e.corpId;
+    prevEndM = startM+SEMINAR_DURATION_MIN;
+  });
+  listEl.innerHTML = items;
+}
+
+/* =====================================================================
+   STAFF PAGE
+   ===================================================================== */
+function renderStaff(){
+  const grid = document.getElementById('staffGrid');
+  grid.innerHTML = staff.map(s=>`
+   <div class="staff ${s.active?'':'inactive'}">
+     <div class="staff-top">
+       <div>
+        <div class="sub">${s.staffId}</div>
+        <input class="name-input" value="${s.name}" onchange="renameStaff('${s.staffId}',this.value)">
+       </div>
+       <button class="toggle ${s.active?'on':''}" onclick="toggleStaffActive('${s.staffId}')" title="활성/비활성"></button>
+     </div>
+     <div class="staff-row-extra">
+       <span class="sub">${s.active?'사용 중':'비활성'}</span>
+       <span class="sub">1일 최대 <input class="maxday-input" type="number" min="1" value="${s.maxPerDay}" onchange="setMaxPerDay('${s.staffId}',this.value)">건</span>
+     </div>
+   </div>`).join('');
+}
+function renameStaff(staffId, name){
+  const s = findStaff(staffId);
+  s.name = (name||'').trim() || s.name;
+  saveState();
+  renderStaff();
+  refreshViewerSelect();
+}
+function toggleStaffActive(staffId){
+  const s = findStaff(staffId);
+  s.active = !s.active;
+  saveState();
+  renderStaff();
+  refreshViewerSelect();
+}
+function setMaxPerDay(staffId, val){
+  const s = findStaff(staffId);
+  const n = parseInt(val,10);
+  s.maxPerDay = (n>0) ? n : 1;
+  saveState();
+  renderStaff();
+}
+function addStaff(){
+  const nums = staff.map(s=>parseInt(s.staffId.split('-')[1],10)).filter(n=>!isNaN(n));
+  const next = (nums.length? Math.max(...nums):0)+1;
+  staff.push({staffId:'STAFF-'+String(next).padStart(3,'0'), name:'담당자 '+String(next).padStart(2,'0'), active:true, maxPerDay:2});
+  saveState();
+  renderStaff();
+  refreshViewerSelect();
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+function renderAll(){
+  refreshViewerSelect();
+  renderDashboard();
+  renderPartners();
+  renderRegions();
+  renderStaff();
+  renderSchedulePage();
+  renderRoute();
+}
+
+loadState();
+renderAll();
 </script>
 </body>
-</html> 
+</html>
