@@ -339,11 +339,13 @@ tr:last-child td{border-bottom:0}
 <aside>
   <div class="nav active" data-page="dashboard">대시보드</div>
   <div class="nav" data-page="partners">협력사 리스트</div>
+  <div class="nav" data-page="register">협력사 등록</div>
   <div class="nav" data-page="regions">지역별 운영기간</div>
   <div class="nav" data-page="request">업체 일정 접수</div>
   <div class="nav" data-page="schedule">배정 일정</div>
   <div class="nav" data-page="route">동선 지도</div>
   <div class="nav" data-page="staff">담당자 관리</div>
+  <div class="nav" data-page="mail">메일 발송</div>
 </aside>
 
 <main>
@@ -404,6 +406,46 @@ tr:last-child td{border-bottom:0}
         </thead>
         <tbody></tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<section id="register" class="page">
+  <div class="title-row">
+    <div>
+      <h1>협력사 등록</h1>
+      <div class="desc">이메일을 포함한 협력사 정보를 직접 등록합니다. 주소를 입력하면 지역이 자동으로 인식·분류되며, 기존 지역명이 없으면 새 지역이 자동 생성됩니다(운영기간은 이후 "지역별 운영기간"에서 설정).</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><strong>개별 등록</strong></div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="field"><label>업체명 *</label><input id="newCoName" placeholder="예: 한솔시공사"></div>
+        <div class="field"><label>이메일</label><input id="newCoEmail" type="email" placeholder="예: contact@partner.co.kr"></div>
+        <div class="field"><label>연락처</label><input id="newCoContact" placeholder="예: 031-000-0000"></div>
+        <div class="field"><label>주소 *</label><input id="newCoAddress" placeholder="예: 경기도 수원시 팔달구 매산로 10" oninput="previewRegionFromAddress('newCoAddress','newCoRegionPreview')"></div>
+      </div>
+      <div class="sub" id="newCoRegionPreview" style="margin-top:10px"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <button class="btn primary" onclick="submitSingleCompany()">협력사 등록</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><strong>여러 건 붙여넣기 등록</strong></div>
+    <div class="panel-body">
+      <div class="desc" style="margin-bottom:8px">한 줄에 한 업체씩, <b>업체명, 이메일, 연락처, 주소</b> 순서로 쉼표(,) 또는 탭으로 구분해 붙여넣으세요.</div>
+      <div class="field">
+        <textarea id="bulkCoText" rows="6" style="width:100%;border:1px solid #dce2e8;border-radius:8px;padding:10px;font-family:inherit" placeholder="한솔시공사, hs@example.com, 031-000-0000, 경기도 수원시 팔달구 매산로 10
+대한건설, dh@example.com, 031-000-0001, 경기도 화성시 동탄대로 55"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <button class="btn" onclick="previewBulkImport()">미리보기</button>
+      </div>
+      <div id="bulkPreviewBox"></div>
     </div>
   </div>
 </section>
@@ -553,6 +595,88 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
+<section id="mail" class="page">
+  <div class="title-row">
+    <div>
+      <h1>일괄 메일 발송</h1>
+      <div class="desc">지역·상태로 협력사를 선택해 안내 메일 초안을 한 번에 준비합니다.</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    실제 SMTP/이메일 발송 API 연동 전입니다. 아래 버튼은 브라우저의 기본 메일 프로그램(mailto)을 열어 초안을 준비하며, 최종 전송은 메일 프로그램에서 직접 눌러야 합니다. 서버에서 자동으로 발송하려면 사내 SMTP 또는 이메일 발송 API(예: SendGrid 등) 연동이 필요합니다.
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><strong>수신 대상 선택</strong></div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>지역</label>
+          <select id="mailRegionFilter" onchange="renderMailPage()"><option value="all">전체 지역</option></select>
+        </div>
+        <div class="field">
+          <label>상태</label>
+          <select id="mailStatusFilter" onchange="renderMailPage()">
+            <option value="all">전체 상태</option>
+            <option value="O">O 배정/진행</option>
+            <option value="대기">대기</option>
+            <option value="X">X 진행 안 함</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <input class="search" id="mailSearch" placeholder="업체명 · 고유번호 검색" oninput="renderMailPage()">
+      </div>
+      <label class="sub" style="display:flex;align-items:center;gap:6px;margin-top:10px">
+        <input type="checkbox" id="mailOnlyWithEmail" checked onchange="renderMailPage()"> 이메일이 등록된 업체만 표시
+      </label>
+      <div style="overflow:auto;margin-top:14px">
+        <table id="mailTable">
+          <thead><tr><th><input type="checkbox" id="mailSelectAll" onchange="toggleMailSelectAll(this.checked)"></th><th>업체</th><th>이메일</th><th>지역</th><th>상태</th><th>최근 발송</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><strong>메일 템플릿</strong></div>
+    <div class="panel-body">
+      <div class="field">
+        <label>템플릿 선택</label>
+        <select id="mailTemplateSelect" onchange="applyMailTemplate(this.value)">
+          <option value="request">희망일정 접수 요청</option>
+          <option value="confirm">배정 확정 안내</option>
+          <option value="custom">직접 작성</option>
+        </select>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>제목</label>
+        <input id="mailSubject" oninput="updateMailPreview()">
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>본문</label>
+        <textarea id="mailBody" rows="8" style="width:100%;border:1px solid #dce2e8;border-radius:8px;padding:10px;font-family:inherit" oninput="updateMailPreview()"></textarea>
+      </div>
+      <div class="sub" style="margin-top:8px">사용 가능한 병합 태그: <code>{{업체명}}</code> <code>{{지역}}</code> <code>{{고유번호}}</code> <code>{{운영기간}}</code> <code>{{배정일시}}</code> <code>{{담당자}}</code> <code>{{참석인원}}</code></div>
+      <div class="info-box" id="mailPreviewBox" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><strong>발송</strong></div>
+    <div class="panel-body">
+      <div class="btn-row">
+        <button class="btn primary" onclick="openIndividualMailDrafts()">선택 업체 개별 메일 초안 만들기 (병합 적용)</button>
+        <button class="btn" onclick="openBccMailDraft()">선택 업체 전체 BCC로 한 번에 발송 준비</button>
+      </div>
+      <div class="sub" style="margin-top:10px">개별 발송은 업체별로 메일 초안을 만들어 {{업체명}} 등 태그가 각 업체 정보로 채워집니다. 아래 목록에서 업체별로 "메일 초안 열기"를 눌러 메일 프로그램을 하나씩 엽니다. BCC 발송은 한 통을 여러 명에게 동시에 보내므로 태그가 병합되지 않고 공통 문구만 사용할 수 있습니다.</div>
+      <div id="mailIndividualList"></div>
+    </div>
+  </div>
+</section>
+
 </main>
 </div>
 
@@ -599,6 +723,17 @@ tr:last-child td{border-bottom:0}
 const STORAGE_KEY = 'seminarSchedulerState_v2';
 const TIME_SLOTS = ['10:00','14:00','16:00'];
 const SEMINAR_DURATION_MIN = 60; // DEMO: 세미나 1건 평균 진행시간(분). 실제 값으로 교체 예정.
+
+const MAIL_TEMPLATES = {
+  request: {
+    subject: '[{{지역}}] 찾아가는 세미나 희망일정 접수 안내 - {{업체명}}',
+    body: '{{업체명}} 담당자님, 안녕하세요.\n\n찾아가는 세미나 희망일정 접수를 요청드립니다.\n- 업체 고유번호: {{고유번호}}\n- 지역 운영기간: {{운영기간}}\n\n희망하시는 날짜/시간 3개와 참석 인원을 회신 부탁드립니다.\n\n감사합니다.'
+  },
+  confirm: {
+    subject: '[세미나 확정] {{업체명}} - {{배정일시}}',
+    body: '{{업체명}} 담당자님, 안녕하세요.\n\n찾아가는 세미나 일정이 아래와 같이 확정되었습니다.\n- 일시: {{배정일시}}\n- 담당자: {{담당자}}\n- 참석 인원: {{참석인원}}명\n\n당일 참석 인원 수에 맞춰 자료를 준비해 방문드리겠습니다.\n\n감사합니다.'
+  }
+};
 
 const DEFAULT_REGIONS = [
  {id:'suwon',      name:'수원', start:'2026-12-01', end:'2026-12-05'},
@@ -718,6 +853,7 @@ function resetDemoData(){
 function findCompany(id){ return companies.find(c=>c.corpId===id); }
 function findStaff(id){ return staff.find(s=>s.staffId===id); }
 function findRegion(id){ return regions.find(r=>r.id===id); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDateLabel(iso){ return iso.slice(5).replace('-','/'); } // 2026-12-03 -> 12/03
 function fmtDateFull(iso){ return iso.replaceAll('-','.'); }
 function timeToMinutes(t){ const[h,m]=t.split(':').map(Number); return h*60+m; }
@@ -772,10 +908,12 @@ function goPage(id){
  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
  if(id==='dashboard') renderDashboard();
  if(id==='partners') renderPartners();
+ if(id==='register') renderRegisterPage();
  if(id==='regions') renderRegions();
  if(id==='schedule') renderSchedulePage();
  if(id==='route') renderRoute();
  if(id==='staff') renderStaff();
+ if(id==='mail') renderMailPage();
 }
 
 /* =====================================================================
@@ -796,9 +934,9 @@ function renderDashboard(){
       return `<tr>
         <td>${fmtDateLabel(c.assignment.date)}</td>
         <td>${c.assignment.time}</td>
-        <td>${s? s.name : '(삭제된 담당자)'}</td>
-        <td class="company">${c.name}</td>
-        <td>${r? r.name : c.regionId}</td>
+        <td>${s? esc(s.name) : '(삭제된 담당자)'}</td>
+        <td class="company">${esc(c.name)}</td>
+        <td>${r? esc(r.name) : esc(c.regionId)}</td>
         <td>${c.attendees||0}명 / ${c.attendees||0}부</td>
         <td>${statusBadge(c.status)}</td>
       </tr>`;
@@ -845,11 +983,11 @@ function renderPartners(){
     const r = findRegion(c.regionId);
     const assignLabel = c.assignment ? `${fmtDateLabel(c.assignment.date)} ${c.assignment.time} · ${(findStaff(c.assignment.staffId)||{}).name||'-'}` : '-';
     const reqLabel = c.requests && c.requests.length ? c.requests.length+'개 접수' : '-';
-    const statusExtra = c.status==='X' && c.xReason ? `<div class="sub">사유: ${c.xReason}</div>` : '';
+    const statusExtra = c.status==='X' && c.xReason ? `<div class="sub">사유: ${esc(c.xReason)}</div>` : '';
     return `<tr>
-      <td><div class="company">${c.name}</div><div class="sub">${c.address}</div></td>
+      <td><div class="company">${esc(c.name)}</div><div class="sub">${esc(c.address)}</div><div class="sub">${esc(c.email||'이메일 없음')}</div></td>
       <td>${c.corpId}</td>
-      <td>${r? r.name : c.regionId}</td>
+      <td>${r? esc(r.name) : esc(c.regionId)}</td>
       <td>${reqLabel}</td>
       <td>${assignLabel}</td>
       <td>${statusBadge(c.status)}${statusExtra}</td>
@@ -859,6 +997,7 @@ function renderPartners(){
         <button class="mini x ${c.status==='X'?'on':''}" onclick="setStatus('${c.corpId}','X')">X</button>
         <button class="mini w ${c.status==='대기'?'on':''}" onclick="setStatus('${c.corpId}','대기')">대기</button>
        </div>
+       <button class="link-btn" style="margin-top:6px" onclick="openCompanyEditModal('${c.corpId}')">정보수정</button>
       </td>
      </tr>`;
   }).join('') || `<tr><td colspan="7" class="sub" style="padding:20px">검색 결과가 없습니다.</td></tr>`;
@@ -904,10 +1043,11 @@ function confirmXReason(){
 function renderRegions(){
   document.getElementById('regionTable').innerHTML = regions.map(r=>{
     const count = companies.filter(c=>c.regionId===r.id).length;
+    const needsSetup = !r.start || !r.end;
     return `<tr class="region-row">
-      <td class="company">${r.name}</td>
-      <td><input type="date" id="rs-${r.id}" value="${r.start}"></td>
-      <td><input type="date" id="re-${r.id}" value="${r.end}"></td>
+      <td class="company">${esc(r.name)} ${r.autoCreated?'<span class="tag-demo">자동 생성</span>':''} ${needsSetup?'<span class="badge no">운영기간 미설정</span>':''}</td>
+      <td><input type="date" id="rs-${r.id}" value="${r.start||''}"></td>
+      <td><input type="date" id="re-${r.id}" value="${r.end||''}"></td>
       <td>${count}개</td>
       <td><button class="btn" onclick="saveRegion('${r.id}')">저장</button></td>
     </tr>`;
@@ -922,6 +1062,198 @@ function saveRegion(regionId){
   saveState();
   renderRegions();
   alert(r.name+' 운영기간이 '+fmtDateFull(start)+' ~ '+fmtDateFull(end)+'(으)로 저장되었습니다.');
+}
+
+/* =====================================================================
+   협력사 등록 & 주소 기반 자동 지역 분류
+   - 주소에 기존 지역명이 포함되어 있으면 그 지역으로 자동 분류한다.
+   - 일치하는 지역이 없으면 주소에서 '~시/군/구' 토큰을 추출해
+     새 지역을 자동 생성한다(운영기간은 비워두고 "운영기간 미설정"으로 표시,
+     관리자가 지역별 운영기간 화면에서 확정해야 한다).
+   ===================================================================== */
+function detectOrCreateRegion(address){
+  const addr = (address||'').trim();
+  if(!addr) return {regionId:null, created:false};
+  const matched = regions.find(r=>addr.includes(r.name));
+  if(matched) return {regionId:matched.id, created:false};
+
+  const m = addr.match(/([가-힣]{2,6}(시|군|구))/);
+  const name = m ? m[1].replace(/(시|군|구)$/,'') : null;
+  if(!name) return {regionId:null, created:false};
+
+  const again = regions.find(r=>r.name===name);
+  if(again) return {regionId:again.id, created:false};
+
+  const id = 'auto_'+name+'_'+Date.now().toString(36)+Math.floor(Math.random()*1000);
+  const region = {id, name, start:'', end:'', autoCreated:true};
+  regions.push(region);
+  return {regionId:region.id, created:true};
+}
+
+function nextCorpId(){
+  const nums = companies.map(c=>parseInt((c.corpId||'').split('-')[1],10)).filter(n=>!isNaN(n));
+  const next = (nums.length? Math.max(...nums):0)+1;
+  return 'HS-'+String(next).padStart(4,'0');
+}
+
+function addCompanyRecord({name,email,contact,address,regionId}){
+  const detect = regionId ? {regionId, created:false} : detectOrCreateRegion(address);
+  const corpId = nextCorpId();
+  const record = {
+    corpId, name, regionId:detect.regionId, address:address||'', contact:contact||'', email:email||'',
+    status:'대기', xReason:null, attendees:null, requests:[], assignment:null, lastMailSentAt:null
+  };
+  companies.push(record);
+  return {record, regionCreated:detect.created, regionId:detect.regionId};
+}
+
+function previewRegionFromAddress(addressInputId, previewElId){
+  const address = document.getElementById(addressInputId).value;
+  const el = document.getElementById(previewElId);
+  const addr = (address||'').trim();
+  if(!addr){ el.textContent=''; return; }
+  const matched = regions.find(r=>addr.includes(r.name));
+  if(matched){ el.textContent = '인식된 지역: '+matched.name+(matched.autoCreated?' (자동생성됨, 운영기간 확인 필요)':''); return; }
+  const m = addr.match(/([가-힣]{2,6}(시|군|구))/);
+  if(m){ el.textContent = '등록 시 새 지역 "'+m[1].replace(/(시|군|구)$/,'')+'"이(가) 자동 생성됩니다 (운영기간은 이후 설정 필요).'; return; }
+  el.textContent = '지역을 인식하지 못했습니다. 등록 후 지역을 직접 지정해 주세요.';
+}
+
+function openCompanyEditModal(corpId){
+  const c = findCompany(corpId);
+  const regionOptions = regions.map(r=>`<option value="${r.id}" ${r.id===c.regionId?'selected':''}>${esc(r.name)}${r.autoCreated?' (자동생성)':''}</option>`).join('');
+  document.getElementById('modalName').textContent = c.name+' 정보 수정';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="edit-grid">
+      <div class="field"><label>업체명</label><input id="editCoName" value="${esc(c.name)}"></div>
+      <div class="field"><label>업체 고유번호</label><input value="${c.corpId}" disabled style="background:#f5f7f9"></div>
+      <div class="field"><label>이메일</label><input id="editCoEmail" type="email" value="${esc(c.email||'')}"></div>
+      <div class="field"><label>연락처</label><input id="editCoContact" value="${esc(c.contact||'')}"></div>
+    </div>
+    <div class="field" style="margin-top:12px"><label>주소</label><input id="editCoAddress" value="${esc(c.address||'')}"></div>
+    <div class="field" style="margin-top:12px"><label>지역</label><select id="editCoRegion">${regionOptions}</select></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <button class="btn" onclick="closeModal()">취소</button>
+      <button class="btn primary" onclick="saveCompanyEdit('${corpId}')">저장</button>
+    </div>`;
+  document.getElementById('detailModal').classList.add('show');
+}
+function saveCompanyEdit(corpId){
+  const c = findCompany(corpId);
+  const name = document.getElementById('editCoName').value.trim();
+  if(!name){ alert('업체명을 입력해 주세요.'); return; }
+  c.name = name;
+  c.email = document.getElementById('editCoEmail').value.trim();
+  c.contact = document.getElementById('editCoContact').value.trim();
+  c.address = document.getElementById('editCoAddress').value.trim();
+  c.regionId = document.getElementById('editCoRegion').value;
+  saveState();
+  closeModal();
+  renderPartners();
+  renderDashboard();
+  renderRegions();
+}
+
+function renderRegisterPage(){
+  document.getElementById('newCoRegionPreview').textContent = '';
+  document.getElementById('bulkPreviewBox').innerHTML = '';
+}
+
+function submitSingleCompany(){
+  const name = document.getElementById('newCoName').value.trim();
+  const email = document.getElementById('newCoEmail').value.trim();
+  const contact = document.getElementById('newCoContact').value.trim();
+  const address = document.getElementById('newCoAddress').value.trim();
+  if(!name){ alert('업체명을 입력해 주세요.'); return; }
+  if(!address){ alert('주소를 입력해 주세요. (지역 자동 인식에 사용됩니다)'); return; }
+
+  const {record, regionCreated, regionId} = addCompanyRecord({name, email, contact, address});
+  saveState();
+
+  document.getElementById('newCoName').value='';
+  document.getElementById('newCoEmail').value='';
+  document.getElementById('newCoContact').value='';
+  document.getElementById('newCoAddress').value='';
+  document.getElementById('newCoRegionPreview').textContent='';
+
+  const region = findRegion(regionId);
+  let msg = record.name+'(을)를 '+record.corpId+'로 등록했습니다.';
+  if(region) msg += '\n지역: '+region.name+(regionCreated? ' (신규 자동 생성됨 - "지역별 운영기간"에서 운영기간을 설정해 주세요)':'');
+  else msg += '\n지역을 자동으로 인식하지 못했습니다. 협력사 리스트에서 "정보수정"으로 지역을 직접 지정해 주세요.';
+  alert(msg);
+
+  renderPartners();
+  renderDashboard();
+  renderRegions();
+}
+
+function parseBulkLine(line){
+  const parts = line.split(/\t|,/).map(s=>s.trim());
+  if(parts.length<4) return null;
+  const [name, email, contact, ...addrParts] = parts;
+  const address = addrParts.join(', ').trim();
+  if(!name || !address) return null;
+  return {name, email, contact, address};
+}
+
+let bulkParsedRows = [];
+function previewBulkImport(){
+  const text = document.getElementById('bulkCoText').value;
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  const box = document.getElementById('bulkPreviewBox');
+  if(!lines.length){ box.innerHTML = '<div class="sub" style="padding:10px">붙여넣은 내용이 없습니다.</div>'; bulkParsedRows=[]; return; }
+
+  const parsedOk = [];
+  const failedLines = [];
+  lines.forEach(line=>{
+    const row = parseBulkLine(line);
+    if(row) parsedOk.push(row); else failedLines.push(line);
+  });
+
+  bulkParsedRows = parsedOk.map(row=>{
+    const addr = row.address;
+    const matched = regions.find(r=>addr.includes(r.name));
+    let regionLabel, willCreate=false;
+    if(matched){ regionLabel = matched.name; }
+    else{
+      const m = addr.match(/([가-힣]{2,6}(시|군|구))/);
+      if(m){ regionLabel = m[1].replace(/(시|군|구)$/,'')+' (자동 생성)'; willCreate=true; }
+      else regionLabel = '인식 안됨';
+    }
+    return {...row, regionLabel, willCreate};
+  });
+
+  const rows = bulkParsedRows.map(r=>`<tr>
+    <td>${esc(r.name)}</td><td>${esc(r.email||'-')}</td><td>${esc(r.contact||'-')}</td><td>${esc(r.address)}</td><td>${esc(r.regionLabel)}</td>
+  </tr>`).join('');
+  const failedHtml = failedLines.length ? `<div class="notice">형식을 인식하지 못한 줄 ${failedLines.length}건은 건너뜁니다: ${failedLines.map(esc).join(' / ')}</div>` : '';
+
+  box.innerHTML = `${failedHtml}
+    <div style="overflow:auto">
+      <table><thead><tr><th>업체명</th><th>이메일</th><th>연락처</th><th>주소</th><th>지역(자동인식)</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px">
+      <button class="btn primary" onclick="commitBulkImport()" ${bulkParsedRows.length===0?'disabled':''}>이 ${bulkParsedRows.length}건 등록</button>
+    </div>`;
+}
+
+function commitBulkImport(){
+  if(!bulkParsedRows.length) return;
+  const count = bulkParsedRows.length;
+  let createdRegions = 0;
+  bulkParsedRows.forEach(row=>{
+    const {regionCreated} = addCompanyRecord({name:row.name, email:row.email, contact:row.contact, address:row.address});
+    if(regionCreated) createdRegions++;
+  });
+  saveState();
+  document.getElementById('bulkCoText').value='';
+  document.getElementById('bulkPreviewBox').innerHTML='';
+  bulkParsedRows = [];
+  alert('협력사 '+count+'건을 등록했습니다.'+(createdRegions? ' 새 지역 '+createdRegions+'개가 자동 생성되었으니 "지역별 운영기간"에서 운영기간을 설정해 주세요.':''));
+  renderPartners();
+  renderDashboard();
+  renderRegions();
 }
 
 /* =====================================================================
@@ -941,8 +1273,8 @@ function searchCompanies(){
  box.innerHTML = found.map(c=>{
    const r = findRegion(c.regionId);
    return `<div class="company-result ${selectedCompany&&selectedCompany.corpId===c.corpId?'selected':''}" onclick="selectCompany('${c.corpId}')">
-     <div class="company">${c.name} ${c.status==='X'?'<span class="badge no" style="margin-left:6px">X</span>':''}</div>
-     <div class="sub">${c.corpId} · ${r?r.name:c.regionId} · ${c.address}</div>
+     <div class="company">${esc(c.name)} ${c.status==='X'?'<span class="badge no" style="margin-left:6px">X</span>':''}</div>
+     <div class="sub">${c.corpId} · ${r?esc(r.name):esc(c.regionId)} · ${esc(c.address)}</div>
    </div>`;
  }).join('') || '<div class="sub" style="padding:15px">검색 결과가 없습니다.</div>';
 }
@@ -953,16 +1285,17 @@ function selectCompany(corpId){
  document.getElementById('requestForm').style.display='block';
  document.getElementById('selectedCompanyName').textContent = selectedCompany.name+' · '+(r?r.name:selectedCompany.regionId);
  document.getElementById('selectedCompanyId').textContent = selectedCompany.corpId;
- document.getElementById('availableRange').textContent = r ? (fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end)) : '지역 정보 없음';
- document.getElementById('selectedCompanyMeta').textContent = selectedCompany.address+' · '+selectedCompany.contact;
+ const regionReady = r && r.start && r.end;
+ document.getElementById('availableRange').textContent = regionReady ? (fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end)) : (r ? '아직 운영기간이 설정되지 않았습니다 (지역별 운영기간 화면에서 먼저 설정해 주세요)' : '지역 정보 없음');
+ document.getElementById('selectedCompanyMeta').textContent = selectedCompany.address+' · '+selectedCompany.contact+(selectedCompany.email?' · '+selectedCompany.email:'');
 
  [1,2,3].forEach(i=>{
    const dInput = document.getElementById('d'+i);
    const tSelect = document.getElementById('t'+i);
-   if(r){ dInput.min = r.start; dInput.max = r.end; }
+   if(regionReady){ dInput.min = r.start; dInput.max = r.end; } else { dInput.removeAttribute('min'); dInput.removeAttribute('max'); }
    tSelect.innerHTML = TIME_SLOTS.map(t=>`<option value="${t}">${t}</option>`).join('');
    const existing = (selectedCompany.requests||[]).find(x=>x.priority===i);
-   dInput.value = existing? existing.date : (r? r.start : '');
+   dInput.value = existing? existing.date : (regionReady? r.start : '');
    tSelect.value = existing? existing.time : TIME_SLOTS[0];
  });
 
@@ -979,6 +1312,7 @@ function syncMaterial(){
 function saveRequest(){
  if(!selectedCompany) return;
  const r = findRegion(selectedCompany.regionId);
+ if(!r || !r.start || !r.end){ alert('이 업체의 지역은 아직 운영기간이 설정되지 않았습니다. "지역별 운영기간" 화면에서 먼저 설정해 주세요.'); return; }
  const picks = [1,2,3].map(i=>({
    priority:i,
    date: document.getElementById('d'+i).value,
@@ -1058,18 +1392,18 @@ function renderSchedulePage(){
     const confirmedHtml = confirmed.map(c=>{
       const s = findStaff(c.assignment.staffId);
       return `<div class="event" onclick="openEventByKey('${c.corpId}')">
-        <div class="event-time"><span>${c.assignment.time} · ${s?s.name:'-'}</span></div>
-        <div class="event-name">${c.name}</div>
-        <div class="event-meta">${(findRegion(c.regionId)||{}).name||c.regionId}<br>참석 ${c.attendees}명 · 자료 ${c.attendees}부</div>
+        <div class="event-time"><span>${c.assignment.time} · ${s?esc(s.name):'-'}</span></div>
+        <div class="event-name">${esc(c.name)}</div>
+        <div class="event-meta">${esc((findRegion(c.regionId)||{}).name||c.regionId)}<br>참석 ${c.attendees}명 · 자료 ${c.attendees}부</div>
       </div>`;
     }).join('');
     const draftHtml = draft.map(a=>{
       const c = findCompany(a.corpId);
       const s = findStaff(a.staffId);
       return `<div class="event draft" onclick="openDraftByKey('${a.corpId}')">
-        <div class="event-time"><span>${a.time} · ${s?s.name:'-'}</span><span class="tag-demo">초안</span></div>
-        <div class="event-name">${c.name}</div>
-        <div class="event-meta">${(findRegion(c.regionId)||{}).name||c.regionId}<br>참석 ${c.attendees}명 · 자료 ${c.attendees}부 · ${a.priorityUsed}순위</div>
+        <div class="event-time"><span>${a.time} · ${s?esc(s.name):'-'}</span><span class="tag-demo">초안</span></div>
+        <div class="event-name">${esc(c.name)}</div>
+        <div class="event-meta">${esc((findRegion(c.regionId)||{}).name||c.regionId)}<br>참석 ${c.attendees}명 · 자료 ${c.attendees}부 · ${a.priorityUsed}순위</div>
       </div>`;
     }).join('');
     const body = confirmedHtml+draftHtml;
@@ -1248,12 +1582,12 @@ function openDraftByKey(corpId){
   const s = findStaff(a.staffId);
   document.getElementById('modalName').textContent = c.name+' (초안)';
   document.getElementById('modalBody').innerHTML = `
-    <div class="sub">${fmtDateLabel(a.date)} ${a.time} · ${s?s.name:'-'} · ${a.priorityUsed}순위 <span class="tag-demo">확정 전</span></div>
+    <div class="sub">${fmtDateLabel(a.date)} ${a.time} · ${s?esc(s.name):'-'} · ${a.priorityUsed}순위 <span class="tag-demo">확정 전</span></div>
     <div class="big-info">
       <div class="big-card"><span>참석 인원</span><strong>${c.attendees}명</strong></div>
       <div class="big-card"><span>준비 자료</span><strong>${c.attendees}부</strong></div>
     </div>
-    <div class="info-box"><strong>주소</strong><div class="sub">${c.address}</div><strong style="display:block;margin-top:8px">연락처</strong><div class="sub">${c.contact}</div></div>
+    <div class="info-box"><strong>주소</strong><div class="sub">${esc(c.address)}</div><strong style="display:block;margin-top:8px">연락처</strong><div class="sub">${esc(c.contact)}</div></div>
     <div style="display:flex;justify-content:flex-end;gap:8px">
       <button class="btn primary" onclick="confirmDraftRow('${c.corpId}');closeModal()">이 배정 확정</button>
     </div>`;
@@ -1265,14 +1599,14 @@ function modalShowView(corpId){
   const s = findStaff(c.assignment.staffId);
   document.getElementById('modalName').textContent = c.name;
   document.getElementById('modalBody').innerHTML = `
-    <div class="sub">${fmtDateLabel(c.assignment.date)} ${c.assignment.time} · ${s?s.name:'(삭제된 담당자)'}</div>
+    <div class="sub">${fmtDateLabel(c.assignment.date)} ${c.assignment.time} · ${s?esc(s.name):'(삭제된 담당자)'}</div>
     <div class="big-info">
       <div class="big-card"><span>참석 인원</span><strong>${c.attendees}명</strong></div>
       <div class="big-card"><span>준비 자료</span><strong>${c.attendees}부</strong></div>
     </div>
     <div class="info-box">
-      <strong>주소</strong><div class="sub">${c.address}</div>
-      <strong style="display:block;margin-top:8px">연락처</strong><div class="sub">${c.contact}</div>
+      <strong>주소</strong><div class="sub">${esc(c.address)}</div>
+      <strong style="display:block;margin-top:8px">연락처</strong><div class="sub">${esc(c.contact)}</div>
     </div>
     <div class="btn-row" style="justify-content:flex-end;display:flex">
       <button class="btn" onclick="modalShowSubstitute('${corpId}')">대타 찾기</button>
@@ -1316,7 +1650,7 @@ function modalShowChangeStaff(corpId){
   document.getElementById('modalBody').innerHTML = `
     <div class="field">
       <label>담당자 선택</label>
-      <select id="editStaff">${staff.map(s=>`<option value="${s.staffId}" ${s.staffId===c.assignment.staffId?'selected':''}>${s.name}${s.active?'':' (비활성)'}</option>`).join('')}</select>
+      <select id="editStaff">${staff.map(s=>`<option value="${s.staffId}" ${s.staffId===c.assignment.staffId?'selected':''}>${esc(s.name)}${s.active?'':' (비활성)'}</option>`).join('')}</select>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:8px">
       <button class="btn" onclick="modalShowView('${corpId}')">취소</button>
@@ -1346,13 +1680,13 @@ function modalShowSubstitute(corpId){
   const rows = candidates.map(r=>{
     const parts = [];
     if(r.prev){
-      const prevName = (findCompany(r.prev.corpId)||{}).name || r.prev.corpId;
+      const prevName = esc((findCompany(r.prev.corpId)||{}).name || r.prev.corpId);
       parts.push('직전 일정('+prevName+' '+r.prev.time+') → 대타 업체 약 '+minutesToLabel(r.travelToTarget));
     } else {
       parts.push('본사(HQ) → 대타 업체 약 '+minutesToLabel(r.travelToTarget)+' (DEMO)');
     }
     if(r.next){
-      parts.push('세미나 종료 후 다음 업체('+(findCompany(r.next.corpId)||{}).name+')까지 약 '+minutesToLabel(r.travelToNext));
+      parts.push('세미나 종료 후 다음 업체('+esc((findCompany(r.next.corpId)||{}).name)+')까지 약 '+minutesToLabel(r.travelToNext));
       parts.push(r.nextOk ? '다음 일정 도착 가능' : '다음 일정 시간 부족');
     } else {
       parts.push('대타 이후 일정 없음');
@@ -1360,14 +1694,14 @@ function modalShowSubstitute(corpId){
     parts.push('오늘 '+r.totalToday+'건'+(r.overCapacity?' · 하루 최대 초과':''));
     const verdict = r.feasible ? '배정 가능' : '배정 불가';
     return `<div class="candidate ${r.feasible?'':'infeasible'}">
-      <strong>${r.staff.name} · ${verdict}</strong>
+      <strong>${esc(r.staff.name)} · ${verdict}</strong>
       <p>${parts.join(' · ')}</p>
       ${r.feasible?`<button class="btn blue" onclick="assignSubstitute('${corpId}','${r.staff.staffId}')">대타 배정</button>`:''}
     </div>`;
   }).join('') || '<div class="sub" style="padding:10px">활성 담당자가 없습니다.</div>';
 
   document.getElementById('modalBody').innerHTML = `
-    <div class="sub">${c.name} · ${fmtDateLabel(c.assignment.date)} ${c.assignment.time} 대타 후보 <span class="tag-demo">DEMO 이동시간 · 지도 API 연동 전</span></div>
+    <div class="sub">${esc(c.name)} · ${fmtDateLabel(c.assignment.date)} ${c.assignment.time} 대타 후보 <span class="tag-demo">DEMO 이동시간 · 지도 API 연동 전</span></div>
     <div style="margin-top:10px">${rows}</div>
     <div style="display:flex;justify-content:flex-end;margin-top:14px">
       <button class="btn" onclick="modalShowView('${corpId}')">뒤로</button>
@@ -1465,7 +1799,7 @@ function renderRoute(){
     y: 70 + Math.floor(i/3)*150
   }));
   stops.forEach((st,i)=>{
-    pins += `<div class="pin" style="left:${positions[i].x}px;top:${positions[i].y}px" title="${st.label}">${i+1}</div>`;
+    pins += `<div class="pin" style="left:${positions[i].x}px;top:${positions[i].y}px" title="${esc(st.label)}">${i+1}</div>`;
     if(i>0){
       const dx = positions[i].x-positions[i-1].x, dy = positions[i].y-positions[i-1].y;
       const len = Math.sqrt(dx*dx+dy*dy);
@@ -1482,8 +1816,8 @@ function renderRoute(){
     const startM = timeToMinutes(e.time);
     const travelNote = prevEndM!==null ? `이전 업체에서 약 ${minutesToLabel(travel)} (DEMO)` : `본사에서 약 ${minutesToLabel(travel)} (DEMO)`;
     items += `<div class="route-item">
-      <strong>${i+2}. ${e.company.name} · ${e.time}</strong>
-      <p>${(findRegion(e.company.regionId)||{}).name||''} · 참석 ${e.company.attendees}명 · 자료 ${e.company.attendees}부<br>${travelNote}</p>
+      <strong>${i+2}. ${esc(e.company.name)} · ${e.time}</strong>
+      <p>${esc((findRegion(e.company.regionId)||{}).name||'')} · 참석 ${e.company.attendees}명 · 자료 ${e.company.attendees}부<br>${travelNote}</p>
     </div>`;
     prevLoc = e.corpId;
     prevEndM = startM+SEMINAR_DURATION_MIN;
@@ -1501,7 +1835,7 @@ function renderStaff(){
      <div class="staff-top">
        <div>
         <div class="sub">${s.staffId}</div>
-        <input class="name-input" value="${s.name}" onchange="renameStaff('${s.staffId}',this.value)">
+        <input class="name-input" value="${esc(s.name)}" onchange="renameStaff('${s.staffId}',this.value)">
        </div>
        <button class="toggle ${s.active?'on':''}" onclick="toggleStaffActive('${s.staffId}')" title="활성/비활성"></button>
      </div>
@@ -1539,6 +1873,165 @@ function addStaff(){
   saveState();
   renderStaff();
   refreshViewerSelect();
+}
+
+/* =====================================================================
+   일괄 메일 발송 (메일 발송 페이지)
+   - 실제 SMTP/이메일 API 연동 전이므로 mailto: 링크로 사용자의 기본
+     메일 프로그램에서 초안을 열도록 구현했다. 서버 자동발송이 필요하면
+     이 부분(openIndividualMailDrafts/openBccMailDraft)만 실제 이메일
+     발송 API 호출로 교체하면 된다.
+   ===================================================================== */
+let mailSelected = new Set();
+
+function mergeTemplate(str, c){
+  const r = findRegion(c.regionId);
+  const period = (r && r.start && r.end) ? (fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end)) : '(운영기간 미정)';
+  const assignLabel = c.assignment ? (fmtDateLabel(c.assignment.date)+' '+c.assignment.time) : '(미배정)';
+  const staffName = c.assignment ? ((findStaff(c.assignment.staffId)||{}).name || '-') : '-';
+  const map = {
+    '{{업체명}}': c.name,
+    '{{지역}}': r ? r.name : (c.regionId||'-'),
+    '{{고유번호}}': c.corpId,
+    '{{운영기간}}': period,
+    '{{배정일시}}': assignLabel,
+    '{{담당자}}': staffName,
+    '{{참석인원}}': c.attendees!=null ? String(c.attendees) : '-',
+  };
+  let out = str||'';
+  Object.keys(map).forEach(k=>{ out = out.split(k).join(map[k]); });
+  return out;
+}
+
+function getFilteredMailCompanies(){
+  const regionFilter = document.getElementById('mailRegionFilter').value;
+  const statusFilter = document.getElementById('mailStatusFilter').value;
+  const onlyWithEmail = document.getElementById('mailOnlyWithEmail').checked;
+  const q = (document.getElementById('mailSearch').value||'').toLowerCase().trim();
+  let list = companies.slice();
+  if(regionFilter && regionFilter!=='all') list = list.filter(c=>c.regionId===regionFilter);
+  if(statusFilter && statusFilter!=='all') list = list.filter(c=>c.status===statusFilter);
+  if(onlyWithEmail) list = list.filter(c=>c.email);
+  if(q) list = list.filter(c=>c.name.toLowerCase().includes(q) || c.corpId.toLowerCase().includes(q));
+  return list;
+}
+
+function renderMailPage(){
+  const regionSel = document.getElementById('mailRegionFilter');
+  const prevRegion = regionSel.value || 'all';
+  regionSel.innerHTML = '<option value="all">전체 지역</option>' + regions.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+  regionSel.value = [...regionSel.options].some(o=>o.value===prevRegion) ? prevRegion : 'all';
+
+  const list = getFilteredMailCompanies();
+  const tb = document.querySelector('#mailTable tbody');
+  tb.innerHTML = list.map(c=>{
+    const r = findRegion(c.regionId);
+    const checked = mailSelected.has(c.corpId) ? 'checked' : '';
+    const lastSent = c.lastMailSentAt ? new Date(c.lastMailSentAt).toLocaleString('ko-KR') : '-';
+    return `<tr>
+      <td><input type="checkbox" ${checked} onchange="toggleMailRecipient('${c.corpId}',this.checked)"></td>
+      <td><div class="company">${esc(c.name)}</div><div class="sub">${c.corpId}</div></td>
+      <td>${esc(c.email||'-')}</td>
+      <td>${r?esc(r.name):'-'}</td>
+      <td>${statusBadge(c.status)}</td>
+      <td class="sub">${lastSent}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="sub" style="padding:20px">대상이 없습니다.</td></tr>`;
+
+  document.getElementById('mailSelectAll').checked = list.length>0 && list.every(c=>mailSelected.has(c.corpId));
+  updateMailPreview();
+}
+
+function toggleMailRecipient(corpId, checked){
+  if(checked) mailSelected.add(corpId); else mailSelected.delete(corpId);
+  const list = getFilteredMailCompanies();
+  document.getElementById('mailSelectAll').checked = list.length>0 && list.every(c=>mailSelected.has(c.corpId));
+  updateMailPreview();
+}
+
+function toggleMailSelectAll(checked){
+  const list = getFilteredMailCompanies();
+  list.forEach(c=>{ checked ? mailSelected.add(c.corpId) : mailSelected.delete(c.corpId); });
+  renderMailPage();
+}
+
+function applyMailTemplate(id){
+  if(id==='custom') return;
+  const t = MAIL_TEMPLATES[id];
+  if(!t) return;
+  document.getElementById('mailSubject').value = t.subject;
+  document.getElementById('mailBody').value = t.body;
+  updateMailPreview();
+}
+
+function updateMailPreview(){
+  const box = document.getElementById('mailPreviewBox');
+  const firstId = [...mailSelected][0];
+  const subjectTpl = document.getElementById('mailSubject').value;
+  const bodyTpl = document.getElementById('mailBody').value;
+  if(!firstId){ box.innerHTML = '<div class="sub">미리보기를 보려면 위 표에서 업체를 1개 이상 선택하세요.</div>'; return; }
+  const c = findCompany(firstId);
+  box.innerHTML = `<div class="sub" style="margin-bottom:6px">미리보기 · ${esc(c.name)} 기준 (선택 ${mailSelected.size}건 중 1건)</div>
+    <div style="font-weight:700;margin-bottom:6px">${esc(mergeTemplate(subjectTpl, c))}</div>
+    <div style="white-space:pre-wrap;font-size:13px;line-height:1.6">${esc(mergeTemplate(bodyTpl, c))}</div>`;
+}
+
+function markMailSentSilent(corpId){
+  const c = findCompany(corpId);
+  if(c) c.lastMailSentAt = new Date().toISOString();
+}
+function markMailSent(corpId){
+  markMailSentSilent(corpId);
+  saveState();
+  renderMailPage();
+}
+
+function openIndividualMailDrafts(){
+  if(mailSelected.size===0){ alert('메일을 보낼 업체를 1개 이상 선택하세요.'); return; }
+  const subjectTpl = document.getElementById('mailSubject').value;
+  const bodyTpl = document.getElementById('mailBody').value;
+  if(!subjectTpl.trim() && !bodyTpl.trim()){ alert('제목 또는 본문을 입력하거나 템플릿을 선택하세요.'); return; }
+
+  const ids = [...mailSelected];
+  const targets = ids.map(findCompany).filter(c=>c && c.email);
+  const missing = ids.map(findCompany).filter(c=>c && !c.email);
+
+  if(targets.length===0){ alert('선택한 업체 중 이메일이 등록된 업체가 없습니다.'); return; }
+
+  const rows = targets.map(c=>{
+    const subject = mergeTemplate(subjectTpl, c);
+    const body = mergeTemplate(bodyTpl, c);
+    const url = 'mailto:'+c.email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    return `<div class="draft-row">
+      <div><b>${esc(c.name)}</b> <span class="sub">${esc(c.email)}</span></div>
+      <button class="btn blue" onclick="window.open('${url}','_blank');markMailSent('${c.corpId}')">메일 초안 열기</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mailIndividualList').innerHTML = `
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-head"><strong>개별 메일 초안 (${targets.length}건)</strong></div>
+      <div class="panel-body" style="padding:0">${rows}</div>
+    </div>
+    ${missing.length? `<div class="sub" style="margin-top:8px">이메일이 없어 제외됨: ${missing.map(c=>esc(c.name)).join(', ')}</div>` : ''}`;
+}
+
+function openBccMailDraft(){
+  if(mailSelected.size===0){ alert('메일을 보낼 업체를 1개 이상 선택하세요.'); return; }
+  const targets = [...mailSelected].map(findCompany).filter(c=>c && c.email);
+  if(targets.length===0){ alert('선택한 업체 중 이메일이 등록된 업체가 없습니다.'); return; }
+
+  const subjectTpl = document.getElementById('mailSubject').value;
+  const bodyTpl = document.getElementById('mailBody').value;
+  const hasTokens = /\{\{[^}]+\}\}/.test(subjectTpl+bodyTpl);
+  if(hasTokens && !confirm('BCC로 한 번에 보내면 {{업체명}} 등 병합 태그가 업체별로 채워지지 않고 그대로 남습니다. 공통 문구로 계속할까요?')) return;
+
+  const bcc = targets.map(c=>c.email).join(',');
+  const url = 'mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent(subjectTpl)+'&body='+encodeURIComponent(bodyTpl);
+  window.open(url, '_blank');
+  targets.forEach(c=>markMailSentSilent(c.corpId));
+  saveState();
+  renderMailPage();
 }
 
 /* =====================================================================
