@@ -608,6 +608,14 @@ tr:last-child td{border-bottom:0}
   </div>
 
   <div class="panel">
+    <div class="panel-head"><strong>지역별 일괄 발송</strong></div>
+    <div class="panel-body" style="padding:0">
+      <div class="desc" style="padding:14px 18px 0">지역마다 운영기간이 다르므로, 지역을 눌러 해당 지역 업체를 한 번에 선택하세요. 선택 후 아래에서 BCC로 발송하면 {{지역}}·{{운영기간}} 태그가 그 지역 값으로 자동 채워집니다.</div>
+      <div id="mailRegionGroups"></div>
+    </div>
+  </div>
+
+  <div class="panel">
     <div class="panel-head"><strong>수신 대상 선택</strong></div>
     <div class="panel-body">
       <div class="form-grid">
@@ -671,7 +679,7 @@ tr:last-child td{border-bottom:0}
         <button class="btn primary" onclick="openIndividualMailDrafts()">선택 업체 개별 메일 초안 만들기 (병합 적용)</button>
         <button class="btn" onclick="openBccMailDraft()">선택 업체 전체 BCC로 한 번에 발송 준비</button>
       </div>
-      <div class="sub" style="margin-top:10px">개별 발송은 업체별로 메일 초안을 만들어 {{업체명}} 등 태그가 각 업체 정보로 채워집니다. 아래 목록에서 업체별로 "메일 초안 열기"를 눌러 메일 프로그램을 하나씩 엽니다. BCC 발송은 한 통을 여러 명에게 동시에 보내므로 태그가 병합되지 않고 공통 문구만 사용할 수 있습니다.</div>
+      <div class="sub" style="margin-top:10px">개별 발송은 업체별로 메일 초안을 만들어 {{업체명}} 등 모든 태그가 각 업체 정보로 채워집니다. 아래 목록에서 업체별로 "메일 초안 열기"를 눌러 메일 프로그램을 하나씩 엽니다. BCC 발송은 한 통을 여러 명에게 동시에 보내는 방식으로, 선택한 업체가 모두 같은 지역이면 {{지역}}·{{운영기간}}은 자동으로 채워지고 {{업체명}} 등 업체별 태그만 공통 문구로 남습니다.</div>
       <div id="mailIndividualList"></div>
     </div>
   </div>
@@ -1903,6 +1911,14 @@ function mergeTemplate(str, c){
   return out;
 }
 
+/* BCC 발송은 한 통을 여러 수신자에게 동시에 보내므로 업체별 태그
+   ({{업체명}} 등)는 병합할 수 없다. 다만 선택된 업체가 모두 같은
+   지역이면 {{지역}}/{{운영기간}}은 그 지역 값으로 안전하게 채울 수 있다. */
+function mergeRegionTokens(str, region){
+  const period = (region && region.start && region.end) ? (fmtDateFull(region.start)+' ~ '+fmtDateFull(region.end)) : '(운영기간 미정)';
+  return (str||'').split('{{지역}}').join(region?region.name:'').split('{{운영기간}}').join(period);
+}
+
 function getFilteredMailCompanies(){
   const regionFilter = document.getElementById('mailRegionFilter').value;
   const statusFilter = document.getElementById('mailStatusFilter').value;
@@ -1916,11 +1932,41 @@ function getFilteredMailCompanies(){
   return list;
 }
 
+function renderMailRegionGroups(){
+  const box = document.getElementById('mailRegionGroups');
+  box.innerHTML = regions.map(r=>{
+    const inRegion = companies.filter(c=>c.regionId===r.id);
+    const withEmail = inRegion.filter(c=>c.email);
+    const sentCount = withEmail.filter(c=>c.lastMailSentAt).length;
+    const period = (r.start && r.end) ? (fmtDateFull(r.start)+' ~ '+fmtDateFull(r.end)) : '운영기간 미설정';
+    const isCurrent = document.getElementById('mailRegionFilter').value===r.id;
+    return `<div class="draft-row">
+      <div>
+        <b>${esc(r.name)}</b> <span class="sub">${period}</span>${r.autoCreated?' <span class="tag-demo">자동 생성</span>':''}
+        <div class="sub">이메일 보유 ${withEmail.length}건 중 발송 ${sentCount}건</div>
+      </div>
+      <button class="btn ${isCurrent?'primary':''}" onclick="selectRegionForMail('${r.id}')" ${withEmail.length===0?'disabled':''}>이 지역 선택 (${withEmail.length}건)</button>
+    </div>`;
+  }).join('') || '<div class="sub" style="padding:16px">등록된 지역이 없습니다.</div>';
+}
+
+function selectRegionForMail(regionId){
+  document.getElementById('mailRegionFilter').value = regionId;
+  document.getElementById('mailStatusFilter').value = 'all';
+  document.getElementById('mailSearch').value = '';
+  document.getElementById('mailOnlyWithEmail').checked = true;
+  mailSelected = new Set(getFilteredMailCompanies().map(c=>c.corpId));
+  renderMailPage();
+  document.getElementById('mailTable').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
 function renderMailPage(){
   const regionSel = document.getElementById('mailRegionFilter');
   const prevRegion = regionSel.value || 'all';
   regionSel.innerHTML = '<option value="all">전체 지역</option>' + regions.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
   regionSel.value = [...regionSel.options].some(o=>o.value===prevRegion) ? prevRegion : 'all';
+
+  renderMailRegionGroups();
 
   const list = getFilteredMailCompanies();
   const tb = document.querySelector('#mailTable tbody');
@@ -2023,11 +2069,21 @@ function openBccMailDraft(){
 
   const subjectTpl = document.getElementById('mailSubject').value;
   const bodyTpl = document.getElementById('mailBody').value;
-  const hasTokens = /\{\{[^}]+\}\}/.test(subjectTpl+bodyTpl);
-  if(hasTokens && !confirm('BCC로 한 번에 보내면 {{업체명}} 등 병합 태그가 업체별로 채워지지 않고 그대로 남습니다. 공통 문구로 계속할까요?')) return;
+
+  const regionIds = new Set(targets.map(c=>c.regionId));
+  let subjectFinal = subjectTpl, bodyFinal = bodyTpl, regionNote = '';
+  if(regionIds.size===1){
+    const region = findRegion([...regionIds][0]);
+    subjectFinal = mergeRegionTokens(subjectTpl, region);
+    bodyFinal = mergeRegionTokens(bodyTpl, region);
+    regionNote = '선택한 업체가 모두 "'+(region?region.name:'-')+'" 지역이라 {{지역}}/{{운영기간}}은 자동으로 채워졌습니다.\n';
+  }
+
+  const hasTokens = /\{\{[^}]+\}\}/.test(subjectFinal+bodyFinal);
+  if(hasTokens && !confirm(regionNote+'남은 {{업체명}} 등 업체별 태그는 병합되지 않고 그대로 남습니다. 공통 문구로 계속할까요?')) return;
 
   const bcc = targets.map(c=>c.email).join(',');
-  const url = 'mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent(subjectTpl)+'&body='+encodeURIComponent(bodyTpl);
+  const url = 'mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent(subjectFinal)+'&body='+encodeURIComponent(bodyFinal);
   window.open(url, '_blank');
   targets.forEach(c=>markMailSentSilent(c.corpId));
   saveState();
