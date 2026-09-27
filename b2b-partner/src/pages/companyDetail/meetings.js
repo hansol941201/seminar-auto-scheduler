@@ -19,6 +19,7 @@ function firstMeetingCard(meeting) {
     });
   }
   return card({
+    className: 'panel-meeting',
     title: '1차 미팅',
     subtitle: `${fmtDate(meeting.plannedDate)} ${esc(meeting.time || '')}`,
     actions: `
@@ -27,7 +28,7 @@ function firstMeetingCard(meeting) {
       ${placeholderButton('완료')}
       ${placeholderButton('후속조치 등록')}`,
     body: `
-      <div class="field-grid">
+      <div class="ro-grid">
         ${readonlyField({ label: '예정일', value: fmtDate(meeting.plannedDate) })}
         ${readonlyField({ label: '시간', value: meeting.time })}
         ${readonlyField({ label: '장소', value: meeting.place })}
@@ -54,6 +55,7 @@ function secondMeetingCard(meeting) {
     });
   }
   return card({
+    className: 'panel-meeting',
     title: '2차 미팅',
     subtitle: `${fmtDate(meeting.plannedDate)} ${esc(meeting.time || '')}`,
     actions: `
@@ -62,7 +64,7 @@ function secondMeetingCard(meeting) {
       ${placeholderButton('완료')}
       ${placeholderButton('MOU 진행')}`,
     body: `
-      <div class="field-grid">
+      <div class="ro-grid">
         ${readonlyField({ label: '예정일', value: fmtDate(meeting.plannedDate) })}
         ${readonlyField({ label: '시간', value: meeting.time })}
         ${readonlyField({ label: '장소', value: meeting.place })}

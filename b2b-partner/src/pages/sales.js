@@ -75,6 +75,7 @@ export function salesPage() {
           subtitle: stageFilter ? `${meta(SALES_STAGE, stageFilter).label} ${rows.length}개` : `${rows.length}개`,
           flush: true,
           body: dataTable({
+            compact: true,
             rowAction: 'openCompany',
             rowDataset: (company) => ({ id: company.id }),
             columns: [

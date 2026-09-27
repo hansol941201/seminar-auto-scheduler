@@ -59,6 +59,7 @@ export function mouPage() {
           subtitle: `${rows.length}개`,
           flush: true,
           body: dataTable({
+            compact: true,
             rowAction: 'openCompanyTab',
             rowDataset: (company) => ({ id: company.id, tab: 'mou' }),
             columns: [

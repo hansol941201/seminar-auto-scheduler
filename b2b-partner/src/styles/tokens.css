@@ -1,53 +1,60 @@
-/* 디자인 토큰 — 기업용 SaaS / 화이트 중심 / 네이비·블루 포인트 */
+/* 디자인 토큰 — 화이트 기반 / 구분선·타이포 중심 / 그림자 없음 */
 :root {
-  /* color */
-  --navy-900: #0d2440;
-  --navy-800: #13314f;
-  --navy-700: #1b3f63;
-  --blue-700: #14479e;
-  --blue-600: #1c5ed6;
-  --blue-500: #2f7ae5;
-  --blue-100: #dbe8fb;
-  --blue-50:  #eff5fe;
-
-  --ink-900: #101a26;
-  --ink-700: #34424f;
-  --ink-500: #5d6b7a;
-  --ink-400: #7d8a97;
-
-  --line-200: #e3e8ee;
-  --line-300: #cfd6df;
-
-  --bg-app: #f4f6f9;
+  /* 배경: 흰색 기반, 미묘한 단계만 */
+  --bg-app: #fbfbfc;
   --bg-surface: #ffffff;
-  --bg-subtle: #f8fafc;
-  --bg-head: #f1f4f8;
+  --bg-subtle: #f7f8f9;
+  --bg-head: #fafbfc;
+  --bg-sunken: #f4f5f7;
 
-  --green-600: #17794a;  --green-50: #e6f5ec;
-  --amber-600: #9a6200;  --amber-50: #fdf3e0;
-  --red-600:   #b3261e;  --red-50:   #fdeceb;
-  --gray-600:  #5d6b7a;  --gray-50:  #f0f2f5;
-  --violet-600:#5b3fb5;  --violet-50:#efeafc;
+  /* 잉크: 위계는 색이 아니라 명도로 */
+  --ink-900: #13171c;
+  --ink-800: #2b323a;
+  --ink-700: #454e58;
+  --ink-500: #6b7480;
+  --ink-400: #8d95a0;
+  --ink-300: #aab1ba;
 
-  /* shape — 과한 둥근 모서리 금지 */
-  --r-sm: 2px;
-  --r-md: 4px;
-  --r-lg: 6px;
+  /* 선: 대부분 hairline 하나로 해결 */
+  --line: #e6e8ec;
+  --line-strong: #d4d8de;
+  --line-faint: #f0f1f4;
 
-  /* elevation — 그림자 최소화 */
-  --shadow-1: 0 1px 2px rgba(13, 36, 64, .06);
-  --shadow-2: 0 6px 24px rgba(13, 36, 64, .12);
+  /* 포인트: 네이비는 텍스트/강조에만, 블루는 상호작용에만 */
+  --navy: #1c2b3f;
+  --navy-soft: #3a4a60;
+  --blue: #1d4ed8;
+  --blue-hover: #1a44bb;
+  --blue-tint: #f2f5fd;
+  --blue-line: #dbe3f8;
 
-  /* spacing */
+  /* 상태색: 채도를 낮춰 표 안에서 튀지 않게 */
+  --green: #14714a;  --green-tint: #eef6f1;
+  --amber: #8a5a00;  --amber-tint: #fbf4e7;
+  --red:   #a32f26;  --red-tint:   #fbeeed;
+  --violet:#4f3aa8;  --violet-tint:#f2f0fb;
+  --gray-tint: #f2f3f5;
+
+  /* 형태: 곡률 최소, 그림자 없음 */
+  --r: 3px;
+  --r-lg: 4px;
+  --shadow-modal: 0 16px 48px rgba(19, 23, 28, .18);
+
+  /* 간격 */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
-  --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
-  --sp-8: 32px;
+  --sp-4: 16px; --sp-5: 20px; --sp-6: 28px; --sp-8: 40px;
 
-  /* type */
-  --fs-xs: 11px; --fs-sm: 12px; --fs-md: 13px;
-  --fs-lg: 15px; --fs-xl: 18px; --fs-2xl: 22px; --fs-3xl: 28px;
+  /* 타이포 */
+  --fs-micro: 10.5px;
+  --fs-xs: 11.5px;
+  --fs-sm: 12.5px;
+  --fs-md: 13.5px;
+  --fs-lg: 15px;
+  --fs-xl: 17px;
+  --fs-2xl: 21px;
+  --fs-3xl: 26px;
 
-  --header-h: 52px;
-  --nav-h: 42px;
-  --maxw: 1600px;
+  --header-h: 50px;
+  --nav-h: 40px;
+  --maxw: 1640px;
 }

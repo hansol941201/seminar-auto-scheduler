@@ -64,6 +64,7 @@ export function companyTable(rows) {
     .reduce((acc, revenue) => acc + revenue.amount, 0), 0);
 
   return dataTable({
+    compact: true,
     rowAction: 'openCompany',
     rowDataset: (company) => ({ id: company.id }),
     rowClass: (company) => (company.status !== 'ACTIVE' ? 'is-muted' : ''),

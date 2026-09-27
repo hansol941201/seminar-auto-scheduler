@@ -88,6 +88,7 @@ export function revenuePage() {
           subtitle: `${year}년 · ${rows.length}건`,
           flush: true,
           body: dataTable({
+            compact: true,
             emptyTitle: '해당 조건의 거래내역이 없습니다',
             rowAction: 'openCompanyTab',
             rowDataset: (row) => ({ id: row.company.id, tab: 'revenue' }),

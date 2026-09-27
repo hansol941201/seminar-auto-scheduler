@@ -156,12 +156,14 @@ export function textareaField({ name, label, value = '', placeholder = '', hint 
     </div>`;
 }
 
-/** 읽기 전용 값 표시 (아직 편집 기능이 없는 상세 필드) */
+/** 읽기 전용 값 표시 — 입력창이 아니라 라벨/값 행으로 보여준다 */
 export function readonlyField({ label, value, span = false, hint = '' }) {
   return `
-    <div class="field ${span ? 'span-2' : ''}">
-      <label>${esc(label)}</label>
-      <div class="input" style="background:var(--bg-subtle);min-height:30px;white-space:pre-wrap">${value ? esc(value) : '<span class="muted">—</span>'}</div>
-      ${hint ? `<span class="hint">${esc(hint)}</span>` : ''}
+    <div class="rofield ${span ? 'span-2' : ''}">
+      <span class="ro-label">${esc(label)}</span>
+      <div>
+        <div class="ro-value ${value ? '' : 'is-empty'}">${value ? esc(value) : '—'}</div>
+        ${hint ? `<span class="hint">${esc(hint)}</span>` : ''}
+      </div>
     </div>`;
 }

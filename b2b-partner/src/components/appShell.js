@@ -22,7 +22,8 @@ export function appHeader() {
   return `
     <header class="app-header">
       <div class="brand">
-        <span class="brand-mark">${esc(PRODUCT_NAME)}</span>
+        <span class="brand-mark">B</span>
+        <span class="brand-name">${esc(PRODUCT_NAME)}</span>
         <span class="brand-sub">${esc(PRODUCT_NAME_KO)}</span>
       </div>
 

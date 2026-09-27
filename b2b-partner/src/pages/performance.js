@@ -70,6 +70,7 @@ export function performancePage() {
           subtitle: `${rows.length}건`,
           flush: true,
           body: dataTable({
+            compact: true,
             rowAction: 'openCompanyTab',
             rowDataset: (row) => ({ id: row.company.id, tab: 'performance' }),
             emptyTitle: '조건에 맞는 실적이 없습니다',

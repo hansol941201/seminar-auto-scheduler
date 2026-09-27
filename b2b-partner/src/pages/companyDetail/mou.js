@@ -21,7 +21,7 @@ export function mouTab(company) {
         subtitle: '미체결 → 진행중 → 체결 → 종료',
         actions: `${badge(statusMeta)}${actionByStatus.map((label) => placeholderButton(label)).join('')}`,
         body: `
-          <div class="field-grid">
+          <div class="ro-grid">
             ${readonlyField({ label: 'MOU 상태', value: statusMeta.label })}
             ${readonlyField({ label: 'MOU 체결일', value: fmtDate(mou.signedDate) })}
             ${readonlyField({ label: '협약기간', value: mou.periodFrom ? `${fmtDate(mou.periodFrom)} ~ ${fmtDate(mou.periodTo)}` : '' })}
