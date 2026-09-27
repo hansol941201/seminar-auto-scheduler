@@ -20,13 +20,20 @@ export function statusBadge(company) { return badge(meta(COMPANY_STATUS, company
 export function stageBadge(company) { return badge(meta(SALES_STAGE, company.salesStage)); }
 export function mouBadge(company) { return badge(meta(MOU_STATUS, company.mou?.status || 'NONE')); }
 
+/** 미팅 상태 배지 — 완료는 진한 블루, 예정은 연한 톤 */
+export function meetingBadge(status) {
+  const label = meta(MEETING_STATUS, status).label;
+  const tone = { DONE: 'badge-done', PLANNED: 'badge-blue', CANCELED: 'badge-outline' }[status] || 'badge-todo';
+  return `<span class="badge ${tone}">${esc(label)}</span>`;
+}
+
 export function meetingCell(meeting) {
   if (!meeting || !meeting.status || meeting.status === 'NONE') {
     return `<span class="muted">—</span>`;
   }
   return `
     <div class="col" style="gap:1px">
-      ${badge(meta(MEETING_STATUS, meeting.status))}
+      ${meetingBadge(meeting.status)}
       <span class="cell-sub">${fmtDate(meeting.plannedDate)}</span>
     </div>`;
 }

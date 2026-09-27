@@ -29,81 +29,80 @@ export function salesPage() {
 
       <div class="stack">
         <div class="grid grid-kpi">
-          ${kpi({ label: '영업 대상 업체', value: num(companies.length), unit: '개', accent: 'navy' })}
-          ${kpi({ label: '1차 미팅 완료', value: num(conversion.firstDone), unit: '개', foot: `예정 ${conversion.firstPlanned}건`, accent: 'blue' })}
-          ${kpi({ label: '2차 미팅 완료', value: num(conversion.secondDone), unit: '개', foot: `예정 ${conversion.secondPlanned}건`, accent: 'violet' })}
-          ${kpi({ label: '1차 → 2차 전환율', value: percent(conversion.firstToSecondRate), accent: 'green' })}
+          ${kpi({ label: '영업 대상 업체', value: num(companies.length), unit: '개' })}
+          ${kpi({ label: '1차 미팅 완료', value: num(conversion.firstDone), unit: '개', foot: `예정 ${conversion.firstPlanned}건` })}
+          ${kpi({ label: '2차 미팅 완료', value: num(conversion.secondDone), unit: '개', foot: `예정 ${conversion.secondPlanned}건` })}
+          ${kpi({ label: 'L2 → L3 전환률', value: percent(conversion.firstToSecondRate), foot: '1차 → 2차 미팅', accent: 'blue' })}
         </div>
 
-        <div class="grid grid-2">
+        <div class="toolbar">
+          <span class="small muted">영업단계</span>
+          <button type="button" class="btn btn-sm ${stageFilter ? '' : 'is-active'}" data-action="salesStage" data-stage="">전체 ${companies.length}</button>
+          ${SALES_STAGE_ORDER.map((stage) => {
+            const count = companies.filter((company) => company.salesStage === stage).length;
+            return `<button type="button" class="btn btn-sm ${stageFilter === stage ? 'is-active' : ''}" data-action="salesStage" data-stage="${stage}">
+              ${esc(meta(SALES_STAGE, stage).label)} ${count}</button>`;
+          }).join('')}
+          <span class="spacer"></span>
+          <span class="filter-summary">${rows.length}개 표시</span>
+        </div>
+
+        <div class="grid grid-2-1">
           ${card({
-            title: '단계별 도달 업체 수',
-            subtitle: '누적 기준 (해당 단계 이상 도달)',
+            title: '업체별 영업 진행',
+            subtitle: stageFilter ? meta(SALES_STAGE, stageFilter).label : '전체',
+            flush: true,
+            body: dataTable({
+              compact: true,
+              rowAction: 'openCompany',
+              rowDataset: (company) => ({ id: company.id }),
+              columns: [
+                { key: 'name', label: '업체명', render: companyNameCell },
+                { key: 'code', label: '업체코드', width: '92px', render: companyCodeCell },
+                { key: 'stage', label: '영업단계', width: '92px', render: stageBadge },
+                { key: 'first', label: '1차 미팅', width: '92px', render: (company) => meetingCell(company.firstMeeting) },
+                { key: 'second', label: '2차 미팅', width: '92px', render: (company) => meetingCell(company.secondMeeting) },
+                { key: 'mou', label: 'MOU', width: '74px', render: mouBadge },
+                { key: 'owner', label: '담당자', width: '80px', render: (company) => esc(company.firstMeeting?.internalOwner || company.salesPipeline?.[0]?.owner || '—') },
+                { key: 'next', label: '다음 일정', width: '132px', render: (company) => {
+                  const next = [company.firstMeeting, company.secondMeeting]
+                    .filter((meeting) => meeting && meeting.status === 'PLANNED' && meeting.plannedDate)
+                    .sort((a, b) => (a.plannedDate < b.plannedDate ? -1 : 1))[0];
+                  return next
+                    ? `${fmtDate(next.plannedDate)} ${badge({ label: relativeDay(next.plannedDate), tone: 'outline' })}`
+                    : '<span class="muted">—</span>';
+                } },
+              ],
+              rows,
+            }),
+          })}
+
+          <div class="stack">
+            ${card({
+              title: '1차 미팅 예정',
+              subtitle: `${firstMeetings.length}건`,
+              body: firstMeetings.length ? meetingTimeline(firstMeetings) : emptyState('예정된 1차 미팅이 없습니다'),
+            })}
+            ${card({
+              title: '2차 미팅 예정',
+              subtitle: `${secondMeetings.length}건`,
+              body: secondMeetings.length ? meetingTimeline(secondMeetings) : emptyState('예정된 2차 미팅이 없습니다'),
+            })}
+          </div>
+        </div>
+
+        <div class="grid grid-2-1">
+          ${card({
+            title: '최근 활동',
+            subtitle: '전 업체 통합',
+            body: activityTimeline(recentActivities(8), { showCompany: true }),
+          })}
+          ${card({
+            title: '단계별 도달 업체',
+            subtitle: '해당 단계 이상',
             body: barList(funnel.map((row) => ({ label: row.label, value: row.reached })), { formatter: (value) => `${value}개` }),
           })}
-          ${card({
-            title: '단계 필터',
-            subtitle: '아래 목록에 즉시 반영',
-            body: `
-              <div class="row wrap" style="gap:6px">
-                <button type="button" class="btn btn-sm ${stageFilter ? '' : 'is-active'}" data-action="salesStage" data-stage="">전체 ${companies.length}</button>
-                ${SALES_STAGE_ORDER.map((stage) => {
-                  const count = companies.filter((company) => company.salesStage === stage).length;
-                  return `<button type="button" class="btn btn-sm ${stageFilter === stage ? 'is-active' : ''}" data-action="salesStage" data-stage="${stage}">
-                    ${esc(meta(SALES_STAGE, stage).label)} ${count}</button>`;
-                }).join('')}
-              </div>
-              <div class="small muted" style="margin-top:10px">단계 전환 로직은 미구현이며, 여기서는 현재 단계값으로만 분류합니다.</div>`,
-          })}
         </div>
-
-        <div class="grid grid-2">
-          ${card({
-            title: '1차 미팅 예정',
-            subtitle: `${firstMeetings.length}건`,
-            body: firstMeetings.length ? meetingTimeline(firstMeetings) : emptyState('예정된 1차 미팅이 없습니다'),
-          })}
-          ${card({
-            title: '2차 미팅 예정',
-            subtitle: `${secondMeetings.length}건`,
-            body: secondMeetings.length ? meetingTimeline(secondMeetings) : emptyState('예정된 2차 미팅이 없습니다'),
-          })}
-        </div>
-
-        ${card({
-          title: '업체별 영업 진행',
-          subtitle: stageFilter ? `${meta(SALES_STAGE, stageFilter).label} ${rows.length}개` : `${rows.length}개`,
-          flush: true,
-          body: dataTable({
-            compact: true,
-            rowAction: 'openCompany',
-            rowDataset: (company) => ({ id: company.id }),
-            columns: [
-              { key: 'name', label: '업체명', render: companyNameCell },
-              { key: 'code', label: '업체코드', width: '96px', render: companyCodeCell },
-              { key: 'stage', label: '영업단계', width: '100px', render: stageBadge },
-              { key: 'first', label: '1차 미팅', width: '100px', render: (company) => meetingCell(company.firstMeeting) },
-              { key: 'second', label: '2차 미팅', width: '100px', render: (company) => meetingCell(company.secondMeeting) },
-              { key: 'mou', label: 'MOU', width: '80px', render: mouBadge },
-              { key: 'owner', label: '내부 담당자', width: '104px', render: (company) => esc(company.firstMeeting?.internalOwner || company.salesPipeline?.[0]?.owner || '—') },
-              { key: 'next', label: '다음 일정', width: '140px', render: (company) => {
-                const next = [company.firstMeeting, company.secondMeeting]
-                  .filter((meeting) => meeting && meeting.status === 'PLANNED' && meeting.plannedDate)
-                  .sort((a, b) => (a.plannedDate < b.plannedDate ? -1 : 1))[0];
-                return next
-                  ? `${fmtDate(next.plannedDate)} ${badge({ label: relativeDay(next.plannedDate), tone: 'outline' })}`
-                  : '<span class="muted">—</span>';
-              } },
-            ],
-            rows,
-          }),
-        })}
-
-        ${card({
-          title: '최근 활동',
-          subtitle: '전 업체 통합 피드',
-          body: activityTimeline(recentActivities(10), { showCompany: true }),
-        })}
       </div>
     </div>`;
 }

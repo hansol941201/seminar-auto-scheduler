@@ -19,7 +19,6 @@ function firstMeetingCard(meeting) {
     });
   }
   return card({
-    className: 'panel-meeting',
     title: '1차 미팅',
     subtitle: `${fmtDate(meeting.plannedDate)} ${esc(meeting.time || '')}`,
     actions: `
@@ -55,7 +54,6 @@ function secondMeetingCard(meeting) {
     });
   }
   return card({
-    className: 'panel-meeting',
     title: '2차 미팅',
     subtitle: `${fmtDate(meeting.plannedDate)} ${esc(meeting.time || '')}`,
     actions: `

@@ -1,60 +1,65 @@
-/* 디자인 토큰 — 화이트 기반 / 구분선·타이포 중심 / 그림자 없음 */
+/* 디자인 토큰 — 화이트 + 연회색 배경 + 연한 블루 포인트 */
 :root {
-  /* 배경: 흰색 기반, 미묘한 단계만 */
-  --bg-app: #fbfbfc;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f7f8f9;
-  --bg-head: #fafbfc;
-  --bg-sunken: #f4f5f7;
+  /* 배경 */
+  --bg-app: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #fbfcfd;
+  --surface-sunken: #f2f4f7;
+  --bg-head: #f8f9fb;
 
-  /* 잉크: 위계는 색이 아니라 명도로 */
-  --ink-900: #13171c;
-  --ink-800: #2b323a;
-  --ink-700: #454e58;
-  --ink-500: #6b7480;
-  --ink-400: #8d95a0;
-  --ink-300: #aab1ba;
+  /* 잉크 */
+  --ink-900: #1a1f27;
+  --ink-800: #2f3742;
+  --ink-700: #495260;
+  --ink-500: #6d7684;
+  --ink-400: #8e97a4;
+  --ink-300: #aeb6c0;
 
-  /* 선: 대부분 hairline 하나로 해결 */
-  --line: #e6e8ec;
-  --line-strong: #d4d8de;
-  --line-faint: #f0f1f4;
+  /* 테두리 */
+  --border: #e5e8ed;
+  --border-strong: #d7dce4;
+  --border-faint: #eef0f4;
 
-  /* 포인트: 네이비는 텍스트/강조에만, 블루는 상호작용에만 */
-  --navy: #1c2b3f;
-  --navy-soft: #3a4a60;
-  --blue: #1d4ed8;
-  --blue-hover: #1a44bb;
-  --blue-tint: #f2f5fd;
-  --blue-line: #dbe3f8;
+  /* 포인트 — 연한 블루 위주, 네이비는 강조 텍스트/배지에만 */
+  --blue-700: #1d4ed8;
+  --blue-600: #2563eb;
+  --blue-500: #3b82f6;
+  --blue-100: #dbe7fe;
+  --blue-50:  #eff5ff;
+  --navy: #1e3a5f;
+  --navy-600: #2a4a75;
 
-  /* 상태색: 채도를 낮춰 표 안에서 튀지 않게 */
-  --green: #14714a;  --green-tint: #eef6f1;
-  --amber: #8a5a00;  --amber-tint: #fbf4e7;
-  --red:   #a32f26;  --red-tint:   #fbeeed;
-  --violet:#4f3aa8;  --violet-tint:#f2f0fb;
-  --gray-tint: #f2f3f5;
+  /* 상태 */
+  --green: #0f7a4f;  --green-50: #e8f6ee;
+  --amber: #8a5b00;  --amber-50: #fdf4e3;
+  --red:   #b3261e;  --red-50:   #fdeeec;
+  --violet:#5b3fc4;  --violet-50:#f0edfc;
+  --gray-50: #f1f3f6;
 
-  /* 형태: 곡률 최소, 그림자 없음 */
-  --r: 3px;
-  --r-lg: 4px;
-  --shadow-modal: 0 16px 48px rgba(19, 23, 28, .18);
+  /* 형태 */
+  --r: 10px;
+  --r-sm: 8px;
+  --r-xs: 6px;
+  --r-badge: 4px;
+  --shadow-modal: 0 20px 56px rgba(26, 31, 39, .2);
 
-  /* 간격 */
-  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
-  --sp-4: 16px; --sp-5: 20px; --sp-6: 28px; --sp-8: 40px;
+  /* 간격 — 업무용 밀도 */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
 
   /* 타이포 */
-  --fs-micro: 10.5px;
-  --fs-xs: 11.5px;
-  --fs-sm: 12.5px;
+  --fs-micro: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
   --fs-md: 13.5px;
   --fs-lg: 15px;
   --fs-xl: 17px;
-  --fs-2xl: 21px;
-  --fs-3xl: 26px;
+  --fs-2xl: 20px;
+  --fs-kpi: 26px;
+  --fs-3xl: 24px;
 
-  --header-h: 50px;
+  --header-h: 52px;
   --nav-h: 40px;
-  --maxw: 1640px;
+  --maxw: 1800px;
+  --gutter: 20px;
 }
