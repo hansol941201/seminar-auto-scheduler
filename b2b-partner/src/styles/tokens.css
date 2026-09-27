@@ -1,0 +1,53 @@
+/* 디자인 토큰 — 기업용 SaaS / 화이트 중심 / 네이비·블루 포인트 */
+:root {
+  /* color */
+  --navy-900: #0d2440;
+  --navy-800: #13314f;
+  --navy-700: #1b3f63;
+  --blue-700: #14479e;
+  --blue-600: #1c5ed6;
+  --blue-500: #2f7ae5;
+  --blue-100: #dbe8fb;
+  --blue-50:  #eff5fe;
+
+  --ink-900: #101a26;
+  --ink-700: #34424f;
+  --ink-500: #5d6b7a;
+  --ink-400: #7d8a97;
+
+  --line-200: #e3e8ee;
+  --line-300: #cfd6df;
+
+  --bg-app: #f4f6f9;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f8fafc;
+  --bg-head: #f1f4f8;
+
+  --green-600: #17794a;  --green-50: #e6f5ec;
+  --amber-600: #9a6200;  --amber-50: #fdf3e0;
+  --red-600:   #b3261e;  --red-50:   #fdeceb;
+  --gray-600:  #5d6b7a;  --gray-50:  #f0f2f5;
+  --violet-600:#5b3fb5;  --violet-50:#efeafc;
+
+  /* shape — 과한 둥근 모서리 금지 */
+  --r-sm: 2px;
+  --r-md: 4px;
+  --r-lg: 6px;
+
+  /* elevation — 그림자 최소화 */
+  --shadow-1: 0 1px 2px rgba(13, 36, 64, .06);
+  --shadow-2: 0 6px 24px rgba(13, 36, 64, .12);
+
+  /* spacing */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* type */
+  --fs-xs: 11px; --fs-sm: 12px; --fs-md: 13px;
+  --fs-lg: 15px; --fs-xl: 18px; --fs-2xl: 22px; --fs-3xl: 28px;
+
+  --header-h: 52px;
+  --nav-h: 42px;
+  --maxw: 1600px;
+}

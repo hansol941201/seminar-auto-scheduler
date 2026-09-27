@@ -1,0 +1,109 @@
+/* ============ 앱 셸: 상단 헤더 + 상단 네비게이션 (좌측 고정 사이드바 없음) ============ */
+.app-header {
+  position: sticky; top: 0; z-index: 40;
+  height: var(--header-h);
+  display: flex; align-items: center; gap: var(--sp-4);
+  padding: 0 var(--sp-5);
+  background: var(--navy-900);
+  color: #fff;
+}
+.brand { display: flex; align-items: baseline; gap: var(--sp-2); }
+.brand-mark {
+  font-weight: 700; font-size: var(--fs-lg); letter-spacing: -0.02em;
+}
+.brand-sub { font-size: var(--fs-xs); color: #9fb4cd; }
+
+.global-search { position: relative; flex: 0 1 420px; }
+.global-search input {
+  width: 100%; height: 30px;
+  padding: 0 var(--sp-3) 0 28px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: var(--r-md);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+}
+.global-search input::placeholder { color: #9fb4cd; }
+.global-search .gs-icon {
+  position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+  color: #9fb4cd; font-size: var(--fs-sm);
+}
+
+.header-actions { display: flex; align-items: center; gap: var(--sp-1); margin-left: auto; }
+.icon-btn {
+  position: relative;
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid transparent; border-radius: var(--r-md);
+  background: transparent; color: #d6e2f0;
+}
+.icon-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+.icon-btn .dot {
+  position: absolute; top: 4px; right: 4px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #ff6b5e;
+}
+.user-chip {
+  display: flex; align-items: center; gap: var(--sp-2);
+  margin-left: var(--sp-2); padding: 3px 8px 3px 3px;
+  border: 1px solid rgba(255,255,255,.16); border-radius: var(--r-md);
+  background: rgba(255,255,255,.06);
+}
+.avatar {
+  width: 22px; height: 22px; border-radius: var(--r-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--blue-500); color: #fff;
+  font-size: var(--fs-xs); font-weight: 700;
+}
+.user-chip .u-name { font-size: var(--fs-sm); }
+.user-chip .u-role { font-size: var(--fs-xs); color: #9fb4cd; }
+
+/* 메인 탭 — 확장 가능한 구조 (항목 추가 시 자동 정렬) */
+.app-nav {
+  position: sticky; top: var(--header-h); z-index: 35;
+  height: var(--nav-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--line-200);
+}
+.app-nav-inner {
+  max-width: var(--maxw); margin: 0 auto; padding: 0 var(--sp-5);
+  height: 100%; display: flex; align-items: stretch; gap: 2px;
+  overflow-x: auto;
+}
+.nav-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 var(--sp-4);
+  border: 0; background: transparent;
+  color: var(--ink-500); font-size: var(--fs-md); font-weight: 500;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.nav-tab:hover { color: var(--ink-900); background: var(--bg-subtle); }
+.nav-tab.is-active { color: var(--blue-700); border-bottom-color: var(--blue-600); font-weight: 600; }
+.nav-tab .count {
+  font-size: var(--fs-xs); color: var(--ink-400);
+  padding: 1px 5px; border-radius: var(--r-sm); background: var(--bg-head);
+}
+
+/* 페이지 영역 */
+.page { max-width: var(--maxw); margin: 0 auto; padding: var(--sp-5); }
+.page-head { display: flex; align-items: flex-start; gap: var(--sp-4); margin-bottom: var(--sp-4); }
+.page-head .titles { min-width: 0; }
+.page-head .page-desc { color: var(--ink-500); font-size: var(--fs-sm); margin-top: 2px; }
+.page-head .actions { margin-left: auto; display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--ink-400); margin-bottom: var(--sp-2); }
+
+/* 그리드 */
+.grid { display: grid; gap: var(--sp-3); }
+.grid-kpi   { grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); }
+.grid-2     { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3     { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-4     { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid-2-1   { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.grid-1-1-1 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+@media (max-width: 1200px) {
+  .grid-2, .grid-3, .grid-4, .grid-2-1 { grid-template-columns: minmax(0, 1fr); }
+}
+
+.stack { display: flex; flex-direction: column; gap: var(--sp-4); }
+.stack-sm { display: flex; flex-direction: column; gap: var(--sp-3); }
