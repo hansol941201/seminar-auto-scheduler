@@ -297,6 +297,35 @@ tr:last-child td{border-bottom:0}
   .priority{grid-template-columns:60px 1fr}
   .priority select:last-child{grid-column:2}
 }
+
+/* 2026-10 simplified UX */
+body{background:#f3f5f8}
+aside{width:230px;padding:18px 12px}
+.nav{padding:13px 14px;font-size:14px;margin-bottom:4px}
+.nav.active{background:#eaf1ff;color:#1f57c3}
+main{max-width:1500px;margin:0 auto;padding:30px}
+h1{font-size:25px;letter-spacing:-.5px}
+.desc{font-size:13px;line-height:1.6}
+.panel{border-radius:14px;box-shadow:0 1px 2px rgba(20,36,58,.03)}
+.panel-head{padding:17px 20px}
+.panel-body{padding:20px}
+.kpis{gap:14px}
+.kpi{border-radius:14px;padding:18px 20px}
+.kpi strong{font-size:27px}
+.btn{min-height:38px}
+.btn.primary{background:#255dcc;border-color:#255dcc}
+.notice{background:#f8fafc;color:#586575;border-color:#e2e7ed;line-height:1.65}
+.sync-bar{border-left:4px solid #356ae6;padding:18px 20px}
+.sync-dot.ready{background:#356ae6}
+.form-grid{gap:18px}
+.field label{font-size:13px;color:#4e5b69;margin-bottom:8px}
+.field input,.field select{min-height:44px;padding:11px 12px}
+.priority{grid-template-columns:82px minmax(220px,420px);justify-content:start;margin-bottom:10px}
+.priority input{min-height:44px;border:1px solid #dce2e8;border-radius:8px;padding:10px}
+.info-box{background:#f8fafc}
+.mail-layout{grid-template-columns:250px minmax(0,1fr)}
+.mail-template{padding:14px}
+@media(max-width:900px){main{padding:20px}.mail-layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -337,8 +366,8 @@ tr:last-child td{border-bottom:0}
 <section id="dashboard" class="page active">
   <div class="title-row">
     <div>
-      <h1>세미나 배정 현황</h1>
-      <div class="desc">업체 희망일정과 담당자 동선을 기준으로 전체 일정을 관리합니다.</div>
+      <h1>세미나 운영 현황</h1>
+      <div class="desc">신청 접수부터 담당자 배정까지 한 화면에서 확인합니다.</div>
     </div>
     <button class="btn primary" onclick="autoAssign()">전체 자동배정</button>
   </div>
@@ -413,8 +442,8 @@ tr:last-child td{border-bottom:0}
 <section id="request" class="page">
   <div class="title-row">
     <div>
-      <h1>업체 일정 접수</h1>
-      <div class="desc">현재 Google Form과 동일한 항목으로 접수합니다. 날짜 3개를 받은 뒤 시간은 담당자 일정과 이동동선을 기준으로 배정합니다.</div>
+      <h1>세미나 신청 접수</h1>
+      <div class="desc">시공사 신청 내용을 확인하는 화면입니다. Google Form 연동 후에는 직접 입력할 필요가 없습니다.</div>
     </div>
   </div>
 
@@ -431,9 +460,10 @@ tr:last-child td{border-bottom:0}
       <button class="btn primary" onclick="demoGoogleSync()">응답 동기화</button>
     </div>
   </div>
-  <div class="notice">현재는 수동 입력으로 테스트할 수 있습니다. 실제 연동 후에는 Google Form의 1·2·3순위, 담당자, 연락처, 참여인원, 주소가 자동으로 들어옵니다.</div>
+  <div class="notice"><strong>현재 테스트 단계</strong> · 지금은 직접 입력할 수 있고, Google Form 연동 후에는 신청 내용이 자동으로 들어옵니다.</div>
 
   <div class="panel">
+    <div class="panel-head"><strong>① 시공사 기본정보</strong><span class="sub">Google Form과 동일한 항목</span></div>
     <div class="panel-body">
       <div class="form-grid">
         <div class="field"><label>시공사명 *</label><input id="reqCompanyName" placeholder="예: 한솔시공사"></div>
@@ -447,15 +477,18 @@ tr:last-child td{border-bottom:0}
         <input id="reqAddress" placeholder="예: 서울특별시 강남구 테헤란로 123, 00빌딩 5층 대회의실">
       </div>
 
-      <div style="font-weight:700;margin:22px 0 5px">희망일자 3개 *</div>
-      <div class="sub" style="margin-bottom:12px">시간은 별도로 받지 않고, 자동배정 시 담당자 일정·이동시간·하루 최대 2건 조건을 함께 계산합니다.</div>
+      <div style="border-top:1px solid var(--line);margin:24px -20px 20px"></div>
+      <div style="font-weight:800;font-size:15px;margin:0 0 5px">② 희망일자</div>
+      <div class="sub" style="margin-bottom:14px">1·2·3순위 날짜만 받습니다. 방문 시간은 자동배정에서 계산합니다.</div>
       <div class="priority"><strong>1순위</strong><input type="date" id="d1"></div>
       <div class="priority"><strong>2순위</strong><input type="date" id="d2"></div>
       <div class="priority"><strong>3순위</strong><input type="date" id="d3"></div>
 
-      <div class="form-grid" style="margin-top:20px">
+      <div style="border-top:1px solid var(--line);margin:24px -20px 20px"></div>
+      <div style="font-weight:800;font-size:15px;margin-bottom:14px">③ 배정 예외 설정</div>
+      <div class="form-grid">
         <div class="field">
-          <label>지정 담당자 <span class="sub">(선택)</span></label>
+          <label>특정 담당자 고정 <span class="sub">(필요한 업체만)</span></label>
           <select id="reqFixedStaff"><option value="">자동배정</option></select>
           <div class="sub" style="margin-top:6px">특정 담당자가 반드시 방문해야 하는 업체만 지정합니다.</div>
         </div>
