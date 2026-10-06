@@ -506,6 +506,7 @@ tr:last-child td{border-bottom:0}
         <div class="panel-head">
           <strong>문구 작성</strong>
           <div style="display:flex;gap:7px">
+            <button class="btn" onclick="resetMailTemplates()">기본 양식 새로 적용</button>
             <button class="btn danger" onclick="deleteMailTemplate()">삭제</button>
             <button class="btn primary" onclick="saveMailTemplate()">저장</button>
           </div>
@@ -526,6 +527,10 @@ tr:last-child td{border-bottom:0}
             <input id="mailSubject" placeholder="메일 제목을 입력하세요" oninput="renderMailPreview()">
           </div>
           <div class="field" style="margin-top:14px">
+            <label>신청 링크</label>
+            <input id="mailApplyLink" placeholder="Google Form 또는 추후 세미나 신청 페이지 주소" oninput="renderMailPreview()">
+          </div>
+          <div class="field" style="margin-top:14px">
             <label>메일 본문</label>
             <textarea id="mailBody" placeholder="여기에 사용하실 메일 문구를 그대로 붙여넣으세요." oninput="renderMailPreview()"></textarea>
           </div>
@@ -538,6 +543,7 @@ tr:last-child td{border-bottom:0}
               <button class="token" onclick="insertMailToken('{세미나시간}')">{세미나시간}</button>
               <button class="token" onclick="insertMailToken('{방문담당자}')">{방문담당자}</button>
               <button class="token" onclick="insertMailToken('{참석인원}')">{참석인원}</button>
+              <button class="token" onclick="insertMailToken('{신청링크}')">{신청링크}</button>
             </div>
           </div>
         </div>
@@ -624,10 +630,10 @@ companies.forEach(c=>{ if(c.fixedStaff===undefined)c.fixedStaff=''; if(c.contact
 let selectedCompany=null;
 
 const defaultMailTemplates=[
- {id:'mail-1',name:'1차 일정 선택 요청',subject:'',body:''},
- {id:'mail-2',name:'2차 일정 확정 안내',subject:'',body:''},
- {id:'mail-3',name:'3차 일정 변경 안내',subject:'',body:''},
- {id:'mail-4',name:'4차 세미나 임박 안내',subject:'',body:''}
+ {id:'mail-1',name:'최초 안내',subject:'2026 POUR 영업전략 세미나 개최 件',body:'세미나 참가 신청은 아래 신청 링크를 통해 개별 신청 부탁드립니다.\n\n{신청링크}'},
+ {id:'mail-2',name:'리마인드',subject:'[리마인드] 2026 POUR 영업전략 세미나 개최 件',body:'세미나 참가 신청은 아래 신청 링크를 통해 개별 신청 부탁드립니다.\n\n{신청링크}'},
+ {id:'mail-3',name:'신청 마감 안내',subject:'2026 POUR 영업전략 세미나 신청 마감 안내',body:''},
+ {id:'mail-4',name:'일정 확정 안내',subject:'2026 POUR 영업전략 세미나 일정 확정 안내',body:''}
 ];
 let mailTemplates=JSON.parse(localStorage.getItem('seminarMailTemplates')||'null')||defaultMailTemplates;
 let activeMailId=mailTemplates[0]?.id||null;
@@ -852,6 +858,12 @@ function addStaff(){
 }
 
 
+function resetMailTemplates(){
+ if(!confirm('현재 저장된 메일 양식을 새 기본 양식으로 바꿀까요?'))return;
+ mailTemplates=defaultMailTemplates.map(x=>({...x}));
+ activeMailId=mailTemplates[0].id;
+ persistMailTemplates(); renderMailManager();
+}
 function persistMailTemplates(){
  localStorage.setItem('seminarMailTemplates',JSON.stringify(mailTemplates));
 }
@@ -877,6 +889,7 @@ function loadActiveMailTemplate(){
  document.getElementById('mailTemplateName').value=t.name||'';
  document.getElementById('mailSubject').value=t.subject||'';
  document.getElementById('mailBody').value=t.body||'';
+ document.getElementById('mailApplyLink').value=t.applyLink||'';
  renderMailPreview();
 }
 function saveMailTemplate(){
@@ -885,6 +898,7 @@ function saveMailTemplate(){
  t.name=document.getElementById('mailTemplateName').value.trim()||'메일 양식';
  t.subject=document.getElementById('mailSubject').value;
  t.body=document.getElementById('mailBody').value;
+ t.applyLink=document.getElementById('mailApplyLink').value;
  persistMailTemplates();
  renderMailManager();
  alert('메일 문구를 저장했습니다.');
@@ -916,7 +930,8 @@ function renderMailPreview(){
    '{세미나일자}':ev?.date||'{세미나일자}',
    '{세미나시간}':ev?.time||'{세미나시간}',
    '{방문담당자}':ev?.staff||'{방문담당자}',
-   '{참석인원}':ev?ev.people+'명':'{참석인원}'
+   '{참석인원}':ev?ev.people+'명':'{참석인원}',
+   '{신청링크}':document.getElementById('mailApplyLink')?.value||'{신청링크}'
  };
  const apply=s=>Object.entries(values).reduce((v,[k,val])=>v.split(k).join(val),s||'');
  document.getElementById('mailPreviewSubject').textContent=apply(document.getElementById('mailSubject')?.value)||'-';
