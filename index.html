@@ -233,6 +233,11 @@ tr:last-child td{border-bottom:0}
 .route-item:last-child{border-bottom:0}
 .route-item strong{font-size:13px}
 .route-item p{font-size:11px;color:var(--muted);margin:5px 0 0;line-height:1.6}
+.sync-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:16px}
+.sync-left{display:flex;align-items:center;gap:12px}
+.sync-dot{width:9px;height:9px;border-radius:50%;background:#aab3bd}
+.sync-dot.ready{background:#c97b18}
+.sync-meta strong{display:block;font-size:13px}.sync-meta span{font-size:11px;color:var(--muted)}
 .mail-layout{display:grid;grid-template-columns:280px 1fr;gap:16px}
 .mail-list{display:flex;flex-direction:column;gap:8px}
 .mail-template{border:1px solid var(--line);background:#fff;border-radius:9px;padding:12px;text-align:left}
@@ -352,6 +357,20 @@ tr:last-child td{border-bottom:0}
 
   <div class="panel">
     <div class="panel-head">
+      <strong>Google Form 연동 상태</strong>
+      <span class="badge wait">연결 전</span>
+    </div>
+    <div class="panel-body" style="display:flex;justify-content:space-between;align-items:center;gap:15px">
+      <div>
+        <div style="font-weight:700;font-size:13px">응답 자동수집 준비 완료</div>
+        <div class="sub" style="margin-top:5px">실제 Google Sheets 연결 후 신규 응답을 자동배정 대상에 반영합니다.</div>
+      </div>
+      <button class="btn" onclick="goPage('request');setTimeout(showGoogleSetup,50)">연동 설정</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
       <strong>이번 배정 요약</strong>
       <button class="btn" onclick="goPage('schedule')">전체 일정 보기</button>
     </div>
@@ -399,7 +418,20 @@ tr:last-child td{border-bottom:0}
     </div>
   </div>
 
-  <div class="notice">Google Form 응답 연동 전에는 여기에서 직접 입력할 수 있습니다. 추후 폼 응답을 연결해도 같은 항목 구조를 그대로 사용합니다.</div>
+  <div class="sync-bar">
+    <div class="sync-left">
+      <div class="sync-dot ready"></div>
+      <div class="sync-meta">
+        <strong>Google Form 응답 연동</strong>
+        <span id="googleSyncText">연동 준비 완료 · 실제 Google Sheets 연결 전</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn" onclick="showGoogleSetup()">연동 설정</button>
+      <button class="btn primary" onclick="demoGoogleSync()">응답 동기화</button>
+    </div>
+  </div>
+  <div class="notice">현재는 수동 입력으로 테스트할 수 있습니다. 실제 연동 후에는 Google Form의 1·2·3순위, 담당자, 연락처, 참여인원, 주소가 자동으로 들어옵니다.</div>
 
   <div class="panel">
     <div class="panel-body">
@@ -581,6 +613,28 @@ tr:last-child td{border-bottom:0}
 </main>
 </div>
 
+<div class="modal-bg" id="googleModal">
+  <div class="modal">
+    <div class="modal-head"><strong>Google Form 연동 설정</strong><button class="close" onclick="closeGoogleSetup()">×</button></div>
+    <div class="modal-body">
+      <div class="notice">지금은 연동할 자리만 구축한 상태입니다. 실제 연결 시 Google Form 응답이 저장되는 Google Sheets 정보를 연결합니다.</div>
+      <div class="field"><label>응답 Google Sheets 주소</label><input id="googleSheetUrl" placeholder="추후 응답 스프레드시트 주소 입력"></div>
+      <div class="info-box" style="margin-top:14px">
+        <strong style="font-size:13px">자동으로 받을 항목</strong>
+        <div class="sub" style="margin-top:7px;line-height:1.8">시공사명 · 담당자명 · 연락처 · 희망일자 1순위 · 2순위 · 3순위 · 참여 예정 인원 · 고객사 사옥 주소</div>
+      </div>
+      <div class="info-box">
+        <strong style="font-size:13px">연동 후 처리</strong>
+        <div class="sub" style="margin-top:7px;line-height:1.8">신규 응답 자동 등록 → 지정 담당자 예외 적용 → 나머지 업체 자동배정 대상 등록</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn" onclick="closeGoogleSetup()">닫기</button>
+        <button class="btn primary" onclick="saveGoogleSetup()">설정 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="detailModal">
   <div class="modal">
     <div class="modal-head">
@@ -714,6 +768,22 @@ function updateCounts(){
  document.getElementById('waitCount').textContent=companies.filter(c=>c.status==='대기').length;
 }
 
+function showGoogleSetup(){
+ const saved=localStorage.getItem('seminarGoogleSheetUrl')||'';
+ document.getElementById('googleSheetUrl').value=saved;
+ document.getElementById('googleModal').classList.add('show');
+}
+function closeGoogleSetup(){document.getElementById('googleModal').classList.remove('show');}
+function saveGoogleSetup(){
+ const url=document.getElementById('googleSheetUrl').value.trim();
+ localStorage.setItem('seminarGoogleSheetUrl',url);
+ document.getElementById('googleSyncText').textContent=url?'설정 저장됨 · 실제 데이터 연결 단계 대기':'연동 준비 완료 · 실제 Google Sheets 연결 전';
+ closeGoogleSetup();
+ alert('연동 설정을 저장했습니다. 실제 Google 데이터 연결은 추후 활성화하면 됩니다.');
+}
+function demoGoogleSync(){
+ alert('현재는 실제 Google Sheets 연결 전입니다.\n연동 후에는 이 버튼으로 신규 응답을 불러오거나 자동 동기화할 수 있습니다.');
+}
 function prepareRequestForm(){
  const staffSel=document.getElementById('reqFixedStaff');
  if(staffSel) staffSel.innerHTML='<option value="">자동배정</option>'+staff.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
@@ -940,6 +1010,7 @@ function renderMailPreview(){
 
 function renderRoute(){}
 
+document.getElementById('googleModal').addEventListener('click',e=>{if(e.target.id==='googleModal')closeGoogleSetup();});
 document.getElementById('detailModal').addEventListener('click',e=>{
  if(e.target.id==='detailModal')closeModal();
 });
