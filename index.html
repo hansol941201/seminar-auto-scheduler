@@ -383,7 +383,7 @@ tr:last-child td{border-bottom:0}
     <div style="overflow:auto">
       <table id="partnerTable">
         <thead>
-          <tr><th>협력사</th><th>고유번호</th><th>지역</th><th>희망일정</th><th>배정</th><th>상태</th><th>변경</th></tr>
+          <tr><th>협력사</th><th>고유번호</th><th>지역</th><th>희망일정</th><th>지정 담당자</th><th>배정</th><th>상태</th><th>변경</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -395,63 +395,48 @@ tr:last-child td{border-bottom:0}
   <div class="title-row">
     <div>
       <h1>업체 일정 접수</h1>
-      <div class="desc">고객관리카드 업체를 검색한 후 해당 지역 운영기간 안에서 희망일시 3개를 등록합니다.</div>
+      <div class="desc">현재 Google Form과 동일한 항목으로 접수합니다. 날짜 3개를 받은 뒤 시간은 담당자 일정과 이동동선을 기준으로 배정합니다.</div>
     </div>
   </div>
+
+  <div class="notice">Google Form 응답 연동 전에는 여기에서 직접 입력할 수 있습니다. 추후 폼 응답을 연결해도 같은 항목 구조를 그대로 사용합니다.</div>
 
   <div class="panel">
     <div class="panel-body">
-      <div class="field">
-        <label>협력사 검색</label>
-        <input class="search" id="companySearch" placeholder="예: 한솔시공사 / HS-0001 / 수원" oninput="searchCompanies()">
-      </div>
-      <div id="companyResults"></div>
-    </div>
-  </div>
-
-  <div class="panel" id="requestForm" style="display:none">
-    <div class="panel-head">
-      <strong id="selectedCompanyName">업체명</strong>
-      <span class="badge wait" id="selectedCompanyId">고유번호</span>
-    </div>
-    <div class="panel-body">
-      <div class="info-box">
-        <div style="font-size:12px;color:#77818d">지역별 세미나 운영 가능기간</div>
-        <strong id="availableRange" style="display:block;margin-top:5px">2026.12.01 ~ 2026.12.05</strong>
+      <div class="form-grid">
+        <div class="field"><label>시공사명 *</label><input id="reqCompanyName" placeholder="예: 한솔시공사"></div>
+        <div class="field"><label>담당자명 *</label><input id="reqContactName" placeholder="일정 조율 시 연락드릴 담당자"></div>
+        <div class="field"><label>연락처 *</label><input id="reqPhone" placeholder="예: 010-0000-0000"></div>
+        <div class="field"><label>참여 예정 인원 * <span class="sub">(최소 3명)</span></label><input type="number" id="people" min="3" value="3" oninput="syncMaterial()"></div>
       </div>
 
-      <div style="font-weight:700;margin:18px 0 10px">희망 날짜·시간 3개</div>
-
-      <div class="priority">
-        <strong>1순위</strong>
-        <input type="date" id="d1">
-        <select id="t1"><option>10:00</option><option>14:00</option><option>16:00</option></select>
-      </div>
-      <div class="priority">
-        <strong>2순위</strong>
-        <input type="date" id="d2">
-        <select id="t2"><option>10:00</option><option>14:00</option><option>16:00</option></select>
-      </div>
-      <div class="priority">
-        <strong>3순위</strong>
-        <input type="date" id="d3">
-        <select id="t3"><option>10:00</option><option>14:00</option><option>16:00</option></select>
+      <div class="field" style="margin-top:14px">
+        <label>고객사 사옥 주소 *</label>
+        <input id="reqAddress" placeholder="예: 서울특별시 강남구 테헤란로 123, 00빌딩 5층 대회의실">
       </div>
 
-      <div class="form-grid" style="margin-top:18px">
+      <div style="font-weight:700;margin:22px 0 5px">희망일자 3개 *</div>
+      <div class="sub" style="margin-bottom:12px">시간은 별도로 받지 않고, 자동배정 시 담당자 일정·이동시간·하루 최대 2건 조건을 함께 계산합니다.</div>
+      <div class="priority"><strong>1순위</strong><input type="date" id="d1"></div>
+      <div class="priority"><strong>2순위</strong><input type="date" id="d2"></div>
+      <div class="priority"><strong>3순위</strong><input type="date" id="d3"></div>
+
+      <div class="form-grid" style="margin-top:20px">
         <div class="field">
-          <label>참석 인원</label>
-          <input type="number" id="people" value="5" min="1" oninput="syncMaterial()">
+          <label>지정 담당자 <span class="sub">(선택)</span></label>
+          <select id="reqFixedStaff"><option value="">자동배정</option></select>
+          <div class="sub" style="margin-top:6px">특정 담당자가 반드시 방문해야 하는 업체만 지정합니다.</div>
         </div>
         <div class="field">
           <label>준비자료</label>
-          <input id="materials" value="5부" readonly style="background:#f5f7f9">
+          <input id="materials" value="3부" readonly style="background:#f5f7f9">
+          <div class="sub" style="margin-top:6px">참여 예정 인원과 동일하게 자동 계산됩니다.</div>
         </div>
       </div>
 
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
-        <button class="btn danger" onclick="markSelectedX()">X 진행 안 함</button>
-        <button class="btn primary" onclick="saveRequest()">희망일정 저장</button>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:22px">
+        <button class="btn danger" onclick="markRequestX()">X 진행 안 함</button>
+        <button class="btn primary" onclick="saveRequest()">접수 저장</button>
       </div>
     </div>
   </div>
@@ -635,6 +620,7 @@ const events = [
  {date:'12/04',time:'14:00',staff:'담당자 03',company:'삼정건설',region:'오산',people:6,address:'경기도 오산시'}
 ];
 
+companies.forEach(c=>{ if(c.fixedStaff===undefined)c.fixedStaff=''; if(c.contactName===undefined)c.contactName=''; if(c.phone===undefined)c.phone=''; if(c.preferences===undefined)c.preferences=[]; });
 let selectedCompany=null;
 
 const defaultMailTemplates=[
@@ -667,6 +653,13 @@ function renderPartners(list=companies){
   <td>${c.id}</td>
   <td>${c.region}</td>
   <td>${c.choices ? c.choices+'개 접수' : '-'}</td>
+  <td>
+   <select class="btn" style="padding:6px 8px;max-width:125px" onchange="setFixedStaff('${c.id}',this.value)">
+    <option value="">자동배정</option>
+    ${staff.map(s=>`<option value="${s}" ${c.fixedStaff===s?'selected':''}>${s}</option>`).join('')}
+   </select>
+   ${c.fixedStaff?'<div class="sub" style="color:#255dcc;margin-top:4px">고정 · '+c.fixedStaff+'</div>':''}
+  </td>
   <td>${c.assign}</td>
   <td>${statusBadge(c.status)}</td>
   <td>
@@ -684,6 +677,13 @@ function statusBadge(s){
  if(s==='O') return '<span class="badge ok">O 배정/진행</span>';
  if(s==='X') return '<span class="badge no">X 진행 안 함</span>';
  return '<span class="badge wait">대기</span>';
+}
+
+function setFixedStaff(id,name){
+ const c=companies.find(x=>x.id===id);
+ if(!c)return;
+ c.fixedStaff=name;
+ renderPartners();
 }
 
 function setStatus(id,s){
@@ -708,50 +708,46 @@ function updateCounts(){
  document.getElementById('waitCount').textContent=companies.filter(c=>c.status==='대기').length;
 }
 
-function searchCompanies(){
- const q=document.getElementById('companySearch').value.toLowerCase().trim();
- const box=document.getElementById('companyResults');
- if(!q){box.innerHTML='';return;}
- const found=companies.filter(c=>
-   c.name.toLowerCase().includes(q)||
-   c.id.toLowerCase().includes(q)||
-   c.region.toLowerCase().includes(q)
- );
- box.innerHTML=found.map(c=>`
-   <div class="company-result" onclick="selectCompany('${c.id}')">
-     <div class="company">${c.name}</div>
-     <div class="sub">${c.id} · ${c.region} · ${c.address}</div>
-   </div>`).join('') || '<div class="sub" style="padding:15px">검색 결과가 없습니다.</div>';
+function prepareRequestForm(){
+ const staffSel=document.getElementById('reqFixedStaff');
+ if(staffSel) staffSel.innerHTML='<option value="">자동배정</option>'+staff.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
 }
-
-function selectCompany(id){
- selectedCompany=companies.find(c=>c.id===id);
- document.getElementById('requestForm').style.display='block';
- document.getElementById('selectedCompanyName').textContent=selectedCompany.name+' · '+selectedCompany.region;
- document.getElementById('selectedCompanyId').textContent=selectedCompany.id;
- document.getElementById('availableRange').textContent=selectedCompany.range;
-}
-
 function syncMaterial(){
- const n=document.getElementById('people').value||0;
+ const n=Math.max(0,Number(document.getElementById('people')?.value||0));
  document.getElementById('materials').value=n+'부';
 }
-
 function saveRequest(){
- if(!selectedCompany)return;
- selectedCompany.choices=3;
- selectedCompany.status='대기';
- alert(selectedCompany.name+'의 희망일정 3개가 저장되었습니다.\\n참석 인원과 동일하게 자료 부수가 자동 적용됩니다.');
- renderPartners();
+ const name=document.getElementById('reqCompanyName').value.trim();
+ const contact=document.getElementById('reqContactName').value.trim();
+ const phone=document.getElementById('reqPhone').value.trim();
+ const address=document.getElementById('reqAddress').value.trim();
+ const people=Number(document.getElementById('people').value);
+ const prefs=['d1','d2','d3'].map(id=>document.getElementById(id).value);
+ if(!name||!contact||!phone||!address||prefs.some(x=>!x)){alert('필수 항목을 모두 입력해 주세요.');return;}
+ if(people<3){alert('참여 예정 인원은 최소 3명 이상입니다.');return;}
+ if(new Set(prefs).size<3){alert('희망일자 1·2·3순위는 서로 다른 날짜로 입력해 주세요.');return;}
+ let company=companies.find(x=>x.name===name);
+ if(!company){
+   company={id:'FORM-'+String(companies.length+1).padStart(4,'0'),name,region:'주소 확인',address,status:'대기',choices:3,assign:'-',range:'',fixedStaff:'',contactName:'',phone:'',preferences:[]};
+   companies.push(company);
+ }
+ company.contactName=contact; company.phone=phone; company.address=address; company.people=people;
+ company.preferences=prefs; company.choices=3; company.status='대기';
+ company.fixedStaff=document.getElementById('reqFixedStaff').value;
+ renderPartners(); updateCounts();
+ alert(name+' 접수를 저장했습니다.\n희망일자 3개와 참여 인원 '+people+'명이 등록되었습니다.'+(company.fixedStaff?'\n지정 담당자: '+company.fixedStaff:'\n담당자: 자동배정'));
 }
-
-function markSelectedX(){
- if(!selectedCompany)return;
- selectedCompany.status='X';
- selectedCompany.choices=0;
- selectedCompany.assign='-';
- alert(selectedCompany.name+'을(를) X 처리했습니다. 자동배정 대상에서 제외됩니다.');
- renderPartners();
+function markRequestX(){
+ const name=document.getElementById('reqCompanyName').value.trim();
+ if(!name){alert('시공사명을 먼저 입력해 주세요.');return;}
+ let company=companies.find(x=>x.name===name);
+ if(!company){
+   company={id:'FORM-'+String(companies.length+1).padStart(4,'0'),name,region:'주소 확인',address:document.getElementById('reqAddress').value.trim(),status:'X',choices:0,assign:'-',range:'',fixedStaff:'',contactName:'',phone:'',preferences:[]};
+   companies.push(company);
+ }
+ company.status='X'; company.choices=0; company.assign='-';
+ renderPartners(); updateCounts();
+ alert(name+'을(를) X 처리했습니다. 자동배정 대상에서 제외됩니다.');
 }
 
 function renderSchedule(){
@@ -815,6 +811,8 @@ function autoAssign(){
   '대상 업체: '+targets.length+'개\\n'+
   '담당자: '+staff.length+'명\\n\\n'+
   '실제 연결 시 아래 조건을 동시에 계산합니다.\\n'+
+  '• 지정 담당자 업체는 해당 담당자로 우선 고정\\n'+
+  '• 나머지 업체는 전체 자동 최적배정\\n'+
   '• 업체 희망일정 1·2·3순위\\n'+
   '• 담당자 하루 최대 2건\\n'+
   '• 기존 담당자 일정\\n'+
@@ -935,6 +933,7 @@ renderPartners();
 renderSchedule();
 renderStaff();
 renderMailManager();
+prepareRequestForm();
 </script>
 </body>
 </html> 
