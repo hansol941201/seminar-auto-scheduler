@@ -233,6 +233,15 @@ tr:last-child td{border-bottom:0}
 .route-item:last-child{border-bottom:0}
 .route-item strong{font-size:13px}
 .route-item p{font-size:11px;color:var(--muted);margin:5px 0 0;line-height:1.6}
+.mail-layout{display:grid;grid-template-columns:280px 1fr;gap:16px}
+.mail-list{display:flex;flex-direction:column;gap:8px}
+.mail-template{border:1px solid var(--line);background:#fff;border-radius:9px;padding:12px;text-align:left}
+.mail-template.active{border-color:#7d9ce7;background:#f4f7ff;color:#255dcc;font-weight:700}
+.mail-editor textarea{width:100%;min-height:330px;resize:vertical;border:1px solid #dce2e8;border-radius:9px;padding:13px;line-height:1.7;font:inherit;outline:none}
+.mail-editor textarea:focus{border-color:#6d91e9;box-shadow:0 0 0 3px #edf2ff}
+.token-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.token{border:1px solid #dbe3ef;background:#f7f9fc;border-radius:20px;padding:6px 9px;font-size:11px;color:#53606e}
+.mail-preview{white-space:pre-wrap;line-height:1.75;font-size:13px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:16px;min-height:170px}
 .staff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .staff{
   border:1px solid var(--line);border-radius:10px;padding:14px;
@@ -278,7 +287,7 @@ tr:last-child td{border-bottom:0}
   main{padding:16px}
   header{padding:0 15px}
   .kpis{grid-template-columns:1fr 1fr}
-  .form-grid,.staff-grid{grid-template-columns:1fr}
+  .form-grid,.staff-grid,.mail-layout{grid-template-columns:1fr}
   .schedule-grid{grid-template-columns:1fr}
   .priority{grid-template-columns:60px 1fr}
   .priority select:last-child{grid-column:2}
@@ -314,6 +323,7 @@ tr:last-child td{border-bottom:0}
   <div class="nav" data-page="request">업체 일정 접수</div>
   <div class="nav" data-page="schedule">배정 일정</div>
   <div class="nav" data-page="route">동선 지도</div>
+  <div class="nav" data-page="mail">메일 관리</div>
   <div class="nav" data-page="staff">담당자 관리</div>
 </aside>
 
@@ -488,6 +498,79 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
+
+<section id="mail" class="page">
+  <div class="title-row">
+    <div>
+      <h1>메일 관리</h1>
+      <div class="desc">메일 문구를 직접 붙여넣고 수정한 뒤 저장할 수 있습니다. 저장한 내용은 이 브라우저에 유지됩니다.</div>
+    </div>
+    <button class="btn" onclick="addMailTemplate()">+ 메일 양식 추가</button>
+  </div>
+
+  <div class="mail-layout">
+    <div class="panel">
+      <div class="panel-head"><strong>메일 양식</strong></div>
+      <div class="panel-body">
+        <div class="mail-list" id="mailTemplateList"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel mail-editor">
+        <div class="panel-head">
+          <strong>문구 작성</strong>
+          <div style="display:flex;gap:7px">
+            <button class="btn danger" onclick="deleteMailTemplate()">삭제</button>
+            <button class="btn primary" onclick="saveMailTemplate()">저장</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>양식 이름</label>
+              <input id="mailTemplateName" placeholder="예: 1차 일정 선택 요청">
+            </div>
+            <div class="field">
+              <label>적용 업체</label>
+              <select id="mailCompany" onchange="renderMailPreview()"></select>
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px">
+            <label>메일 제목</label>
+            <input id="mailSubject" placeholder="메일 제목을 입력하세요" oninput="renderMailPreview()">
+          </div>
+          <div class="field" style="margin-top:14px">
+            <label>메일 본문</label>
+            <textarea id="mailBody" placeholder="여기에 사용하실 메일 문구를 그대로 붙여넣으세요." oninput="renderMailPreview()"></textarea>
+          </div>
+          <div style="margin-top:12px">
+            <div class="sub">필요하면 아래 값을 클릭해 본문에 삽입할 수 있습니다.</div>
+            <div class="token-row">
+              <button class="token" onclick="insertMailToken('{업체명}')">{업체명}</button>
+              <button class="token" onclick="insertMailToken('{지역}')">{지역}</button>
+              <button class="token" onclick="insertMailToken('{세미나일자}')">{세미나일자}</button>
+              <button class="token" onclick="insertMailToken('{세미나시간}')">{세미나시간}</button>
+              <button class="token" onclick="insertMailToken('{방문담당자}')">{방문담당자}</button>
+              <button class="token" onclick="insertMailToken('{참석인원}')">{참석인원}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><strong>메일 미리보기</strong><span class="badge wait">발송 기능 연결 전</span></div>
+        <div class="panel-body">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:5px">제목</div>
+          <div id="mailPreviewSubject" style="font-weight:700;margin-bottom:16px">-</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:5px">본문</div>
+          <div class="mail-preview" id="mailPreviewBody">메일 문구를 입력하면 여기에 표시됩니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="staff" class="page">
   <div class="title-row">
     <div>
@@ -554,6 +637,15 @@ const events = [
 
 let selectedCompany=null;
 
+const defaultMailTemplates=[
+ {id:'mail-1',name:'1차 일정 선택 요청',subject:'',body:''},
+ {id:'mail-2',name:'2차 일정 확정 안내',subject:'',body:''},
+ {id:'mail-3',name:'3차 일정 변경 안내',subject:'',body:''},
+ {id:'mail-4',name:'4차 세미나 임박 안내',subject:'',body:''}
+];
+let mailTemplates=JSON.parse(localStorage.getItem('seminarMailTemplates')||'null')||defaultMailTemplates;
+let activeMailId=mailTemplates[0]?.id||null;
+
 document.querySelectorAll('.nav').forEach(n=>{
  n.addEventListener('click',()=>goPage(n.dataset.page));
 });
@@ -564,6 +656,7 @@ function goPage(id){
  if(id==='schedule') renderSchedule();
  if(id==='partners') renderPartners();
  if(id==='staff') renderStaff();
+ if(id==='mail') renderMailManager();
 }
 
 function renderPartners(list=companies){
@@ -760,6 +853,78 @@ function addStaff(){
  renderStaff();
 }
 
+
+function persistMailTemplates(){
+ localStorage.setItem('seminarMailTemplates',JSON.stringify(mailTemplates));
+}
+function renderMailManager(){
+ const list=document.getElementById('mailTemplateList');
+ if(!list)return;
+ if(!mailTemplates.length){
+   mailTemplates=[{id:'mail-'+Date.now(),name:'새 메일 양식',subject:'',body:''}];
+   activeMailId=mailTemplates[0].id;
+ }
+ list.innerHTML=mailTemplates.map(t=>`<button class="mail-template ${t.id===activeMailId?'active':''}" onclick="selectMailTemplate('${t.id}')">${t.name}</button>`).join('');
+ const sel=document.getElementById('mailCompany');
+ sel.innerHTML='<option value="">업체 선택</option>'+companies.map(x=>`<option value="${x.id}">${x.name} · ${x.region}</option>`).join('');
+ loadActiveMailTemplate();
+}
+function selectMailTemplate(id){
+ activeMailId=id;
+ renderMailManager();
+}
+function loadActiveMailTemplate(){
+ const t=mailTemplates.find(x=>x.id===activeMailId);
+ if(!t)return;
+ document.getElementById('mailTemplateName').value=t.name||'';
+ document.getElementById('mailSubject').value=t.subject||'';
+ document.getElementById('mailBody').value=t.body||'';
+ renderMailPreview();
+}
+function saveMailTemplate(){
+ const t=mailTemplates.find(x=>x.id===activeMailId);
+ if(!t)return;
+ t.name=document.getElementById('mailTemplateName').value.trim()||'메일 양식';
+ t.subject=document.getElementById('mailSubject').value;
+ t.body=document.getElementById('mailBody').value;
+ persistMailTemplates();
+ renderMailManager();
+ alert('메일 문구를 저장했습니다.');
+}
+function addMailTemplate(){
+ const t={id:'mail-'+Date.now(),name:'새 메일 양식',subject:'',body:''};
+ mailTemplates.push(t); activeMailId=t.id; persistMailTemplates(); renderMailManager();
+ document.getElementById('mailTemplateName').focus();
+}
+function deleteMailTemplate(){
+ if(!activeMailId||!confirm('이 메일 양식을 삭제할까요?'))return;
+ mailTemplates=mailTemplates.filter(x=>x.id!==activeMailId);
+ activeMailId=mailTemplates[0]?.id||null;
+ persistMailTemplates(); renderMailManager();
+}
+function insertMailToken(token){
+ const ta=document.getElementById('mailBody');
+ const start=ta.selectionStart, end=ta.selectionEnd;
+ ta.value=ta.value.slice(0,start)+token+ta.value.slice(end);
+ ta.focus(); ta.selectionStart=ta.selectionEnd=start+token.length;
+ renderMailPreview();
+}
+function renderMailPreview(){
+ const company=companies.find(x=>x.id===document.getElementById('mailCompany')?.value);
+ const ev=company?events.find(x=>x.company===company.name):null;
+ const values={
+   '{업체명}':company?.name||'{업체명}',
+   '{지역}':company?.region||'{지역}',
+   '{세미나일자}':ev?.date||'{세미나일자}',
+   '{세미나시간}':ev?.time||'{세미나시간}',
+   '{방문담당자}':ev?.staff||'{방문담당자}',
+   '{참석인원}':ev?ev.people+'명':'{참석인원}'
+ };
+ const apply=s=>Object.entries(values).reduce((v,[k,val])=>v.split(k).join(val),s||'');
+ document.getElementById('mailPreviewSubject').textContent=apply(document.getElementById('mailSubject')?.value)||'-';
+ document.getElementById('mailPreviewBody').textContent=apply(document.getElementById('mailBody')?.value)||'메일 문구를 입력하면 여기에 표시됩니다.';
+}
+
 function renderRoute(){}
 
 document.getElementById('detailModal').addEventListener('click',e=>{
@@ -769,6 +934,7 @@ document.getElementById('detailModal').addEventListener('click',e=>{
 renderPartners();
 renderSchedule();
 renderStaff();
+renderMailManager();
 </script>
 </body>
 </html> 
