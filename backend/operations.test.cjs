@@ -5,9 +5,15 @@ const {createHandler}=require('./api.cjs');
 const {createStore}=require('./firestore-store.cjs');
 const {createServer}=require('node:http');
 const person={id:'fixture-staff',name:'가상 담당자'};
-function state(){const s=emptyState();s.mapping={[person.name]:person.id};s.mappingMeta={[person.name]:{staffId:person.id,nameAtApproval:person.name,reviewedAt:'2026-10-12'}};s.vacationPolicy={enabled:true,startDate:'2099-01-01',endDate:'2099-01-31',approvedAt:'2026-10-12'};s.companies=[{id:'fixture',name:'가상업체',address:'가상시 가상로 1',contactName:'가상',phone:'테스트',status:'대기',preferences:['2099-01-15','2099-01-16','2099-01-17'],slots:[780],duration:120,people:3}];return s;}
+function state(){const s=emptyState();s.seminarPeriod={startDate:'2099-01-01',endDate:'2099-01-31'};s.mapping={[person.name]:person.id};s.mappingMeta={[person.name]:{staffId:person.id,nameAtApproval:person.name,reviewedAt:'2026-10-12'}};s.vacationPolicy={enabled:true,startDate:'2099-01-01',endDate:'2099-01-31',approvedAt:'2026-10-12'};s.companies=[{id:'fixture',name:'가상업체',address:'가상시 가상로 1',contactName:'가상',phone:'테스트',status:'대기',preferences:['2099-01-15','2099-01-16','2099-01-17'],slots:[780],duration:120,people:3}];return s;}
 const candidate={id:'proposal/fixture',companyId:'fixture',staffId:person.id,date:'2099-01-15',start:780,end:900,address:'가상시 가상로 1'};
 const snapshot=()=>({roster:[person],events:[],months:[],vacationHealth:{fresh:false},readAt:Date.now()});
+test('서버도 신규 신청의 기간을 검증하며 기간 변경만으로 기존 확정/휴가 설정 유지',async()=>{
+ const current=state();current.confirmed=[{...candidate,status:'confirmed'}];const next=structuredClone(current);next.seminarPeriod={startDate:'2026-12-01',endDate:'2026-12-02'};
+ const result=await prepareUpdate({current,next});assert.deepEqual(result.confirmed,current.confirmed);assert.deepEqual(result.vacationPolicy,current.vacationPolicy);
+ const newRequest=structuredClone(next);newRequest.companies.push({...current.companies[0],id:'new'});await assert.rejects(prepareUpdate({current:next,next:newRequest}),/세미나 기간/);
+ const unconfigured=state();unconfigured.seminarPeriod=null;const proposed=structuredClone(unconfigured);proposed.confirmed=[candidate];await assert.rejects(prepareUpdate({current:unconfigured,next:proposed,approval:{type:'confirm'},sourceLoader:async()=>snapshot()}),/기간 미설정/);
+});
 test('기간 설정 저장은 기존 신청과 확정 세미나를 수정하거나 삭제하지 않음',async()=>{
  const current=state();current.confirmed=[{...candidate,status:'confirmed'}];const before=JSON.stringify(current),next=structuredClone(current);
  next.vacationPolicy={enabled:false,startDate:'2026-12-01',endDate:'',approvedAt:'2026-10-12'};
@@ -40,7 +46,7 @@ test('지도 API는 서버 인증, 초→분 변환, 미래 예측 표시, 호�
 test('주소 모호·API 오류는 예상값으로 숨기지 않고 확정 차단',async()=>{
  const provider=createKakao({key:'fixture',fetcher:async()=>({ok:true,json:async()=>({meta:{total_count:2},documents:[{},{}]})})});
  await assert.rejects(provider.route({address:'가상시 가상로 1',date:'2099-01-15',end:660},{address:'가상시 가상로 2'}),/둘 이상/);
- const s=state(),ctx={events:[{date:candidate.date,staffIds:[person.id],labels:[person.name],start:540,end:660,address:'가상시 가상로 2'}],fresh:true,vacationFresh:false,vacationPolicy:s.vacationPolicy,months:[],linkedIds:[person.id],settings:s.travelSettings};const result=await assess(candidate,person,ctx,[],provider);assert.equal(result.ok,false);assert.equal(result.routeErrors.length,1);
+ const s=state(),ctx={seminarPeriod:s.seminarPeriod,events:[{date:candidate.date,staffIds:[person.id],labels:[person.name],start:540,end:660,address:'가상시 가상로 2'}],fresh:true,vacationFresh:false,vacationPolicy:s.vacationPolicy,months:[],linkedIds:[person.id],settings:s.travelSettings};const result=await assess(candidate,person,ctx,[],provider);assert.equal(result.ok,false);assert.equal(result.routeErrors.length,1);
 });
 test('HTTP API 인증·역할·동시 수정·재전송 검증',async t=>{
  let version=0,data=state(),commits=0;const receipts=new Map();

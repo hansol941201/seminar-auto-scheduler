@@ -3,16 +3,32 @@ const C=require('./scheduler-core.js'),Reader=require('./source-reader.js');
 const person={id:'fixture-person',name:'가상 담당자'};
 const policy={enabled:true,startDate:'2099-01-01',endDate:'2099-01-31',approvedAt:'2026-10-12T00:00:00Z'};
 const candidate={id:'proposal/fixture',companyId:'fixture',staffId:person.id,date:'2099-01-15',start:780,end:900,address:'가상시 가상로 1'};
-const context=()=>({fresh:true,vacationFresh:false,months:[],vacationPolicy:policy,nowDate:'2099-01-01',events:[],linkedIds:[person.id],region:()=> '가상시',travel:()=>({minutes:30,estimated:true}),bufferMinutes:15});
+const context=()=>({seminarPeriod:{startDate:'2098-12-01',endDate:'2099-02-28'},fresh:true,vacationFresh:false,months:[],vacationPolicy:policy,nowDate:'2099-01-01',events:[],linkedIds:[person.id],region:()=> '가상시',travel:()=>({minutes:30,estimated:true}),bufferMinutes:15});
 const leave=(props={})=>({id:'vacation/fixture',date:candidate.date,start:0,end:1440,vacation:true,staffIds:[person.id],labels:[person.name],title:'휴가',...props});
+test('세미나 기간은 양쪽 날짜 필수, 역순 불가, 시작·종료일 포함',()=>{
+ for(const period of [null,{}, {startDate:'2026-12-01'}, {startDate:'2026-12-10',endDate:'2026-12-01'}])assert.equal(C.periodValid(period),false);
+ const period={startDate:'2026-12-01',endDate:'2026-12-10'};
+ for(const d of ['2026-12-01','2026-12-10'])assert.equal(C.inPeriod(d,period),true);
+ for(const d of ['2026-11-30','2026-12-11'])assert.equal(C.inPeriod(d,period),false);
+});
+test('휴가 예외와 독립적으로 미설정/기간 밖 자동배정 차단, 확정 일정 보존',()=>{
+ const request={id:'fixture',preferences:['2099-01-14','2099-01-15','2099-01-16'],slots:[780],duration:120,address:candidate.address,status:'대기'};
+ const confirmed=[{...candidate,id:'confirmed',companyId:'existing',date:'2099-01-14',status:'confirmed'}],before=JSON.stringify(confirmed);
+ assert.deepEqual(C.plan([request],[person],{...context(),seminarPeriod:null},confirmed),[]);
+ const narrow={...context(),seminarPeriod:{startDate:'2099-01-15',endDate:'2099-01-15'}};
+ assert.equal(C.plan([request],[person],narrow,confirmed)[0].date,'2099-01-15');
+ assert.equal(C.check(confirmed[0],person,narrow,confirmed).status,'확인 필요');
+ assert.equal(JSON.stringify(confirmed),before);
+ assert.equal(C.check(candidate,person,{...narrow,vacationPolicy:{enabled:false}}).ok,false);
+});
 test('한국시간 자정·연말 경계는 기기 시간대와 무관하게 실제 날짜 사용',()=>{
  assert.equal(C.seoulDate('2026-11-30T14:59:59Z'),'2026-11-30');
  assert.equal(C.seoulDate('2026-11-30T15:00:00Z'),'2026-12-01');
  assert.equal(C.seoulDate('2026-12-31T15:00:00Z'),'2027-01-01');
 });
-test('12월 시작일은 표시 제안만 제공하며 저장 상태·종료일·확정 일정 변경 없음',()=>{
+test('날짜 기본값 없이 저장 상태·종료일·확정 일정 변경 없음',()=>{
  const state={vacationPolicy:{enabled:false},confirmed:[candidate],events:[leave()]},before=JSON.stringify(state);
- assert.deepEqual(C.operationPeriodDraft(state.vacationPolicy),{enabled:false,startDate:'2026-12-01',endDate:'',suggested:true});
+ assert.deepEqual(C.operationPeriodDraft(state.vacationPolicy),{enabled:false,startDate:'',endDate:'',suggested:true});
  assert.equal(JSON.stringify(state),before);
  assert.equal(C.vacationException(state.vacationPolicy,'2026-12-01','2026-10-12'),false);
  const existing={enabled:true,startDate:'2026-12-10',endDate:'2026-12-20',approvedAt:'2026-10-12'};

@@ -7,7 +7,9 @@ function seoulDate(now=Date.now()){
  const value=type=>parts.find(p=>p.type===type).value;return value('year')+'-'+value('month')+'-'+value('day');
 }
 // Display-only proposal: never write defaults or infer an end date on load.
-function operationPeriodDraft(policy={}){return {enabled:policy.enabled===true,startDate:policy.startDate||'2026-12-01',endDate:policy.endDate||'',suggested:!policy.startDate};}
+function operationPeriodDraft(policy={}){return {enabled:policy.enabled===true,startDate:policy.startDate||'',endDate:policy.endDate||'',suggested:!policy.startDate};}
+function periodValid(p){return !!p&&dayOK(p.startDate)&&dayOK(p.endDate)&&p.startDate<=p.endDate;}
+function inPeriod(date,p){return periodValid(p)&&dayOK(date)&&date>=p.startDate&&date<=p.endDate;}
 function minute(s){const text=String(s??'').trim().replace(/시\s*/,':').replace(/분$/,'');const m=/^(\d{1,2})(?::(\d{2})?(?::\d{2})?)?$/.exec(text);return m&&+m[1]<24&&+(m[2]||0)<60?+m[1]*60 + +(m[2]||0):null;}
 function interval(r){
  const parts=String(r.time||'').split(/\s*[~～–-]\s*/);
@@ -80,6 +82,7 @@ function normalize(raw,roster,mapping,{includeVacation=true}={}){
 function check(candidate,person,ctx,assigned=[]){
  const reasons=[],warnings=[],legs=[];let travel=0;const buffer=ctx.bufferMinutes??15;
  if(!Number.isFinite(buffer)||buffer<0)reasons.push('이동 여유시간 설정 오류');
+ if(!periodValid(ctx.seminarPeriod))reasons.push('세미나 기간 미설정');else if(!inPeriod(candidate.date,ctx.seminarPeriod))reasons.push('세미나 기간 밖 · 확인 필요');
  if(!ctx.fresh)reasons.push('동기화 실패 또는 최신 확인 필요');
  if(!person||!ctx.linkedIds.includes(person.id))reasons.push('담당자 연결 미확인');
  if(!dayOK(candidate.date)||!Number.isFinite(candidate.start)||!Number.isFinite(candidate.end)||candidate.end<=candidate.start||candidate.start<0||candidate.end>1440)reasons.push('세미나 시간 오류');
@@ -128,5 +131,5 @@ function plan(requests,people,ctx,confirmed){
  }
  return beam[0]?.items||[];
 }
-const api={paths,dayOK,seoulDate,operationPeriodDraft,minute,interval,vacationInterval,labels,mappingAudit,verifiedMapping,vacationHealth,vacationException,normalize,check,plan};root.SchedulerCore=api;if(typeof module!=='undefined')module.exports=api;
+const api={paths,dayOK,seoulDate,operationPeriodDraft,periodValid,inPeriod,minute,interval,vacationInterval,labels,mappingAudit,verifiedMapping,vacationHealth,vacationException,normalize,check,plan};root.SchedulerCore=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

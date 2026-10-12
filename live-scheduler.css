@@ -1,4 +1,5 @@
 :root{--blue:#203650;--green:#365548;--orange:#6e624b}
+button.nav{border:0;background:transparent;text-align:left;width:100%;font-family:inherit;cursor:pointer}button.nav.active{background:#edf0f4;color:#14243a}
 body.booting .layout,body.booting header{display:none}#bootNotice{padding:40px;line-height:1.7}
 .btn.primary,.btn.blue{background:#14243a;border-color:#14243a;color:white}.nav.active{background:#edf0f4;color:#14243a}
 .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi strong{font-size:23px}.sync-bar{border-left-color:#14243a;display:flex;justify-content:space-between;gap:16px;align-items:center}.schedule-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.event.existing{background:#f0f2f5;border-left-color:#7c8795}.event p{margin:8px 0}.event small{overflow-wrap:anywhere}.day>p{padding:16px}.staff-grid{display:flex;flex-direction:column}.staff select{max-width:70%}input,select{border:1px solid #dce2e8;border-radius:6px;padding:8px}button:disabled{opacity:.45;cursor:not-allowed}pre{white-space:pre-wrap;overflow-wrap:anywhere}.notice{font-size:13px}p{line-height:1.6}[hidden]{display:none!important}
