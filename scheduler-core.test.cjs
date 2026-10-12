@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),C=require('./scheduler-core.js');
 const person={id:'test-a',name:'테스트 담당자'};
 const candidate={id:'candidate',companyId:'test-company',staffId:person.id,date:'2026-10-13',start:780,end:900,address:'테스트시 A'};
-const ctx=()=>({events:[],fresh:true,vacationFresh:true,months:['2026-10'],linkedIds:[person.id],region:()=> '테스트시',travel:()=>({minutes:30,estimated:false})});
+const ctx=()=>({events:[],fresh:true,vacationFresh:true,months:['2026-10'],linkedIds:[person.id],region:()=> '테스트시',travel:()=>({minutes:30,estimated:false,verified:true})});
 const busy=(props={})=>({id:'pt/test',date:candidate.date,start:540,end:660,address:'테스트시 B',title:'테스트 업무',staffIds:[person.id],unresolved:false,...props});
 test('2시간 기본 종료 및 명시 종료 우선',()=>{assert.equal(C.interval({time:'09:00'}).end,660);assert.equal(C.interval({time:'09:00',endTime:'10:00'}).end,600);assert.equal(C.interval({time:'09:00'}).estimatedEnd,true);});
 test('원본의 한국어/정수 시간 지원',()=>{assert.equal(C.minute('08시30분'),510);assert.equal(C.minute('10'),600);assert.equal(C.minute('25:00'),null);});

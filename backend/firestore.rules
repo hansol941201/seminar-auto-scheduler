@@ -1,0 +1,8 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Browser clients cannot bypass server approval, CAS, membership or audit.
+    // Deploy ONLY to the separate seminar project; never to the source project.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
