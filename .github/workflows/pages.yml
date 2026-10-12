@@ -25,10 +25,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Stage production files only
+        run: |
+          mkdir -p public
+          cp index.html live-scheduler.css scheduler-core.js source-reader.js shared-client.js live-scheduler.js public/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: "public"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -5,6 +5,25 @@ const policy={enabled:true,startDate:'2099-01-01',endDate:'2099-01-31',approvedA
 const candidate={id:'proposal/fixture',companyId:'fixture',staffId:person.id,date:'2099-01-15',start:780,end:900,address:'가상시 가상로 1'};
 const context=()=>({fresh:true,vacationFresh:false,months:[],vacationPolicy:policy,nowDate:'2099-01-01',events:[],linkedIds:[person.id],region:()=> '가상시',travel:()=>({minutes:30,estimated:true}),bufferMinutes:15});
 const leave=(props={})=>({id:'vacation/fixture',date:candidate.date,start:0,end:1440,vacation:true,staffIds:[person.id],labels:[person.name],title:'휴가',...props});
+test('한국시간 자정·연말 경계는 기기 시간대와 무관하게 실제 날짜 사용',()=>{
+ assert.equal(C.seoulDate('2026-11-30T14:59:59Z'),'2026-11-30');
+ assert.equal(C.seoulDate('2026-11-30T15:00:00Z'),'2026-12-01');
+ assert.equal(C.seoulDate('2026-12-31T15:00:00Z'),'2027-01-01');
+});
+test('12월 시작일은 표시 제안만 제공하며 저장 상태·종료일·확정 일정 변경 없음',()=>{
+ const state={vacationPolicy:{enabled:false},confirmed:[candidate],events:[leave()]},before=JSON.stringify(state);
+ assert.deepEqual(C.operationPeriodDraft(state.vacationPolicy),{enabled:false,startDate:'2026-12-01',endDate:'',suggested:true});
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(C.vacationException(state.vacationPolicy,'2026-12-01','2026-10-12'),false);
+ const existing={enabled:true,startDate:'2026-12-10',endDate:'2026-12-20',approvedAt:'2026-10-12'};
+ assert.equal(C.operationPeriodDraft(existing).startDate,existing.startDate);
+ assert.equal(C.operationPeriodDraft(existing).endDate,existing.endDate);
+});
+test('관리자 활성화·양쪽 날짜·승인이 모두 있어야 휴가 예외 적용',()=>{
+ const approved={enabled:true,startDate:'2026-12-01',endDate:'2026-12-20',approvedAt:'2026-10-12'};
+ for(const patch of [{enabled:false},{startDate:''},{endDate:''},{approvedAt:''}])assert.equal(C.vacationException({...approved,...patch},'2026-12-01','2026-10-12'),false);
+ assert.equal(C.vacationException(approved,'2026-12-01','2026-10-12'),true);
+});
 test('휴가 예외는 승인된 기간에만 적용하고 종료 다음 날 자동 복귀',()=>{
  assert.equal(C.check(candidate,person,context()).ok,true);
  for(const date of ['2098-12-31','2099-02-01'])assert.equal(C.check({...candidate,date},person,context()).ok,false);

@@ -8,6 +8,12 @@ const person={id:'fixture-staff',name:'가상 담당자'};
 function state(){const s=emptyState();s.mapping={[person.name]:person.id};s.mappingMeta={[person.name]:{staffId:person.id,nameAtApproval:person.name,reviewedAt:'2026-10-12'}};s.vacationPolicy={enabled:true,startDate:'2099-01-01',endDate:'2099-01-31',approvedAt:'2026-10-12'};s.companies=[{id:'fixture',name:'가상업체',address:'가상시 가상로 1',contactName:'가상',phone:'테스트',status:'대기',preferences:['2099-01-15','2099-01-16','2099-01-17'],slots:[780],duration:120,people:3}];return s;}
 const candidate={id:'proposal/fixture',companyId:'fixture',staffId:person.id,date:'2099-01-15',start:780,end:900,address:'가상시 가상로 1'};
 const snapshot=()=>({roster:[person],events:[],months:[],vacationHealth:{fresh:false},readAt:Date.now()});
+test('기간 설정 저장은 기존 신청과 확정 세미나를 수정하거나 삭제하지 않음',async()=>{
+ const current=state();current.confirmed=[{...candidate,status:'confirmed'}];const before=JSON.stringify(current),next=structuredClone(current);
+ next.vacationPolicy={enabled:false,startDate:'2026-12-01',endDate:'',approvedAt:'2026-10-12'};
+ const result=await prepareUpdate({current,next,sourceLoader:async()=>{throw Error('기간 저장만으로 원본 변경/재승인 불필요');}});
+ assert.deepEqual(result.confirmed,current.confirmed);assert.deepEqual(result.companies,current.companies);assert.equal(JSON.stringify(current),before);
+});
 test('서버는 승인 때 최신 업무 재조회, 휴가 예외만 허용',async()=>{
  const current=state(),next=structuredClone(current);next.confirmed=[candidate];let reads=0;
  const result=await prepareUpdate({current,next,approval:{type:'confirm'},sourceLoader:async()=>{reads++;return snapshot();}});assert.equal(reads,1);assert.equal(result.confirmed[0].vacationExceptionApplied,true);
